@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Plough: seven stars and the line that joins them. The asterism almost everyone
+     can already find, and the one that points the way to everything else.
+
+     Geometric rather than hand-drawn, unlike the other marks in this shop - this one is
+     an MMD-style icon: exact circles, one stroke weight, no wobble. A constellation is a
+     figure people match against the real sky, and a wobbling copy of it would be a worse
+     figure rather than a warmer one.
+
+     Weights are set to sit alongside the bubble vial and the speedometer dial at launcher
+     size; drawn finer, this one went thin next to them.
+
+     Sizes follow the real magnitudes. Megrez, where the handle meets the bowl, is the
+     faint one, and is drawn smallest for the same reason it looks that way overhead.
+
+     Everything sits inside the central 66 units the launcher mask is certain to keep. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- the joining line: up the handle, round the bowl, back to Megrez -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3.0"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M27.1,45.7 L39.3,47.6 L51.6,48.8 L63.8,51.9 L80.9,47.6 L78.5,59.8 L67.5,62.3 L63.8,51.9" />
+
+    <!-- Alkaid -->
+    <path android:fillColor="#000000" android:pathData="M22.7,45.7 A4.4,4.4 0 1 0 31.4,45.7 A4.4,4.4 0 1 0 22.7,45.7 Z" />
+    <!-- Mizar -->
+    <path android:fillColor="#000000" android:pathData="M35.2,47.6 A4.1,4.1 0 1 0 43.4,47.6 A4.1,4.1 0 1 0 35.2,47.6 Z" />
+    <!-- Alioth -->
+    <path android:fillColor="#000000" android:pathData="M46.9,48.8 A4.6,4.6 0 1 0 56.2,48.8 A4.6,4.6 0 1 0 46.9,48.8 Z" />
+    <!-- Megrez -->
+    <path android:fillColor="#000000" android:pathData="M60.7,51.9 A3.1,3.1 0 1 0 66.9,51.9 A3.1,3.1 0 1 0 60.7,51.9 Z" />
+    <!-- Phecda -->
+    <path android:fillColor="#000000" android:pathData="M63.6,62.3 A3.8,3.8 0 1 0 71.3,62.3 A3.8,3.8 0 1 0 63.6,62.3 Z" />
+    <!-- Merak -->
+    <path android:fillColor="#000000" android:pathData="M74.1,59.8 A4.4,4.4 0 1 0 82.8,59.8 A4.4,4.4 0 1 0 74.1,59.8 Z" />
+    <!-- Dubhe -->
+    <path android:fillColor="#000000" android:pathData="M76.3,47.6 A4.6,4.6 0 1 0 85.5,47.6 A4.6,4.6 0 1 0 76.3,47.6 Z" />
+</vector>
