@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -31,6 +32,20 @@ import com.wanderwildwood.seizu.ui.TimeDialog
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // The screen stays on while this app is in front.
+        //
+        // A star chart is held up towards the sky and looked back and forth from, outside,
+        // in the dark, usually in gloves — the one situation where the ordinary screen
+        // timeout is not a sensible default but a fault. Worse than the waking is what
+        // waking costs you: a phone that has just lit its lock screen has taken your
+        // night vision with it, and that takes twenty minutes to get back.
+        //
+        // This is the window flag, not a WAKE_LOCK: it needs no permission, and Android
+        // drops it by itself the moment the window loses focus, so it cannot be left on
+        // by accident or outlive the app.
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         setContent {
             ThemeMMD {
                 StarChart()
