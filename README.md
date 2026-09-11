@@ -107,12 +107,6 @@ Two real mistakes were caught that way while this was being built: the library r
 `(right ascension, declination)` in **degrees** where the horizontal conversion wants right
 ascension in **hours**, and it measures azimuth **from south**, not from north.
 
-## Support
-
-This is free software and it stays free; there is nothing here to buy. If you would like to
-send something somewhere anyway, there are some llamas who go through a great deal of hay:
-<https://hotspringsllamas.org/donate/>
-
 ## Licence
 
 **GNU General Public License v3.0 or later.** See [LICENSE](LICENSE).
