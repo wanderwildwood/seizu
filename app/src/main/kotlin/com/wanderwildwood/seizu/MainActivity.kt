@@ -28,6 +28,7 @@ import com.wanderwildwood.seizu.ui.LocationDialog
 import com.wanderwildwood.seizu.ui.ObjectDialog
 import com.wanderwildwood.seizu.ui.SettingsScreen
 import com.wanderwildwood.seizu.ui.TimeDialog
+import com.wanderwildwood.seizu.ui.monochrome
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContent {
-            ThemeMMD {
+            ThemeMMD(colorScheme = monochrome) {
                 StarChart()
             }
         }
