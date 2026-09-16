@@ -17,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
@@ -45,7 +44,7 @@ fun SettingsScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBarMMD(
-                title = { TextMMD(text = "Settings", fontSize = 24.sp) },
+                title = { TextMMD(text = "Settings") },
                 navigationIcon = { BarButton(Icons.Close, "Close", onClose) },
                 actions = { BarButton(Icons.Info, "About", { aboutOpen = true }) },
             )
@@ -136,11 +135,11 @@ private fun Row(title: String, value: String, note: String? = null, onClick: () 
             .clickable(onClick = onClick)
             .padding(vertical = 13.dp),
     ) {
-        TextMMD(text = title, fontSize = 18.sp)
-        TextMMD(text = value, fontSize = 14.sp)
+        TextMMD(text = title, style = MaterialTheme.typography.bodyMedium)
+        TextMMD(text = value, style = MaterialTheme.typography.labelSmall)
         if (note != null) {
             Spacer(Modifier.height(2.dp))
-            TextMMD(text = note, fontSize = 13.sp)
+            TextMMD(text = note, style = MaterialTheme.typography.labelSmall)
         }
     }
 }

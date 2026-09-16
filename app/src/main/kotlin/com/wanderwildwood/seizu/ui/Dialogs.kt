@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,7 +13,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
@@ -56,20 +56,20 @@ fun LocationDialog(
     var bad by remember { mutableStateOf(false) }
 
     EInkDialog(onDismiss = onDismiss) {
-        TextMMD(text = "Where", fontSize = 20.sp, fontWeight = FontWeight.Medium)
+        TextMMD(text = "Where", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
 
-        TextMMD(text = "Latitude, degrees north", fontSize = 13.sp)
+        TextMMD(text = "Latitude, degrees north", style = MaterialTheme.typography.labelSmall)
         TextFieldMMD(value = lat, onValueChange = { lat = it; bad = false })
         Spacer(Modifier.height(10.dp))
-        TextMMD(text = "Longitude, degrees east", fontSize = 13.sp)
+        TextMMD(text = "Longitude, degrees east", style = MaterialTheme.typography.labelSmall)
         TextFieldMMD(value = lon, onValueChange = { lon = it; bad = false })
 
         if (bad) {
             Spacer(Modifier.height(8.dp))
             TextMMD(
                 text = "Latitude runs -90 to 90, longitude -180 to 180.",
-                fontSize = 13.sp,
+                style = MaterialTheme.typography.labelSmall,
             )
         }
 
@@ -85,21 +85,21 @@ fun LocationDialog(
                 }
             },
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Use this", fontSize = 15.sp) }
+        ) { TextMMD(text = "Use this", style = MaterialTheme.typography.bodySmall) }
 
         if (canUseGps) {
             Spacer(Modifier.height(8.dp))
             OutlinedButtonMMD(
                 onClick = onUseGps,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
-            ) { TextMMD(text = "Ask the GPS", fontSize = 15.sp) }
+            ) { TextMMD(text = "Ask the GPS", style = MaterialTheme.typography.bodySmall) }
         }
 
         Spacer(Modifier.height(8.dp))
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Cancel", fontSize = 15.sp) }
+        ) { TextMMD(text = "Cancel", style = MaterialTheme.typography.bodySmall) }
     }
 }
 
@@ -125,21 +125,21 @@ fun TimeDialog(
     var bad by remember { mutableStateOf(false) }
 
     EInkDialog(onDismiss = onDismiss) {
-        TextMMD(text = "When", fontSize = 20.sp, fontWeight = FontWeight.Medium)
+        TextMMD(text = "When", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
 
-        TextMMD(text = "Year, month, day", fontSize = 13.sp)
+        TextMMD(text = "Year, month, day", style = MaterialTheme.typography.labelSmall)
         TextFieldMMD(value = year, onValueChange = { year = it; bad = false })
         TextFieldMMD(value = month, onValueChange = { month = it; bad = false })
         TextFieldMMD(value = day, onValueChange = { day = it; bad = false })
         Spacer(Modifier.height(8.dp))
-        TextMMD(text = "Hour and minute, on this phone's clock", fontSize = 13.sp)
+        TextMMD(text = "Hour and minute, on this phone's clock", style = MaterialTheme.typography.labelSmall)
         TextFieldMMD(value = hour, onValueChange = { hour = it; bad = false })
         TextFieldMMD(value = minute, onValueChange = { minute = it; bad = false })
 
         if (bad) {
             Spacer(Modifier.height(8.dp))
-            TextMMD(text = "That is not a date this can chart.", fontSize = 13.sp)
+            TextMMD(text = "That is not a date this can chart.", style = MaterialTheme.typography.labelSmall)
         }
 
         Spacer(Modifier.height(14.dp))
@@ -159,19 +159,19 @@ fun TimeDialog(
                 }
             },
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Chart this moment", fontSize = 15.sp) }
+        ) { TextMMD(text = "Chart this moment", style = MaterialTheme.typography.bodySmall) }
 
         Spacer(Modifier.height(8.dp))
         OutlinedButtonMMD(
             onClick = { onSet(null) },
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Back to now", fontSize = 15.sp) }
+        ) { TextMMD(text = "Back to now", style = MaterialTheme.typography.bodySmall) }
 
         Spacer(Modifier.height(8.dp))
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Cancel", fontSize = 15.sp) }
+        ) { TextMMD(text = "Cancel", style = MaterialTheme.typography.bodySmall) }
     }
 }
 
@@ -184,7 +184,7 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
             is SkyBody -> objectAt.label
             else -> "Object"
         }
-        TextMMD(text = title, fontSize = 20.sp, fontWeight = FontWeight.Medium)
+        TextMMD(text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
 
         when (objectAt) {
@@ -217,13 +217,13 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Close", fontSize = 15.sp) }
+        ) { TextMMD(text = "Close", style = MaterialTheme.typography.bodySmall) }
     }
 }
 
 @Composable
 private fun Line(label: String, value: String) {
-    TextMMD(text = "$label: $value", fontSize = 14.sp)
+    TextMMD(text = "$label: $value", style = MaterialTheme.typography.labelSmall)
     Spacer(Modifier.height(4.dp))
 }
 
@@ -232,7 +232,7 @@ fun AboutDialog(onDismiss: () -> Unit) {
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(
             text = "Star Chart ${BuildConfig.VERSION_NAME}",
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Medium,
         )
 
@@ -240,29 +240,29 @@ fun AboutDialog(onDismiss: () -> Unit) {
         TextMMD(
             text = "Black on white, like a paper chart. A screen full of black would be " +
                 "unreadable outdoors and slow to redraw here.",
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.labelSmall,
         )
 
         Spacer(Modifier.height(14.dp))
         TextMMD(
             text = "Stars from the Yale Bright Star Catalogue. Positions are computed on " +
                 "the phone; nothing is fetched and nothing is sent.",
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.labelSmall,
         )
 
         Spacer(Modifier.height(14.dp))
         TextMMD(
             text = "After AndroidPlanisphere by Timo Engel, whose astronomy this runs on " +
                 "unchanged.",
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.labelSmall,
         )
 
         Spacer(Modifier.height(14.dp))
-        TextMMD(text = "GNU General Public License v3 or later", fontSize = 14.sp)
-        TextMMD(text = "Icons from Material Symbols, Apache 2.0", fontSize = 14.sp)
+        TextMMD(text = "GNU General Public License v3 or later", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = "Icons from Material Symbols, Apache 2.0", style = MaterialTheme.typography.labelSmall)
 
         Spacer(Modifier.height(14.dp))
-        TextMMD(text = "github.com/wanderwildwood/seizu", fontSize = 14.sp)
+        TextMMD(text = "github.com/wanderwildwood/seizu", style = MaterialTheme.typography.labelSmall)
 
         Spacer(Modifier.height(14.dp))
         Llama()
@@ -271,7 +271,7 @@ fun AboutDialog(onDismiss: () -> Unit) {
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Close", fontSize = 15.sp) }
+        ) { TextMMD(text = "Close", style = MaterialTheme.typography.bodySmall) }
     }
 }
 
@@ -314,6 +314,6 @@ private fun Llama() {
             modifier = Modifier.size(22.dp),
         )
         Spacer(Modifier.width(6.dp))
-        TextMMD(text = "Feed the llamas", fontSize = 14.sp)
+        TextMMD(text = "Feed the llamas", style = MaterialTheme.typography.labelSmall)
     }
 }

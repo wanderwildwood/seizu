@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -44,7 +43,7 @@ fun ChartScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBarMMD(
-                title = { TextMMD(text = "Star Chart", fontSize = 24.sp) },
+                title = { TextMMD(text = "Star Chart") },
                 actions = { BarButton(Icons.Settings, "Settings", onSettings) },
             )
         },
@@ -59,11 +58,11 @@ fun ChartScreen(
                         modifier = Modifier.fillMaxSize().padding(top = 60.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        TextMMD(text = "Reading the catalogue…", fontSize = 16.sp)
+                        TextMMD(text = "Reading the catalogue…", style = MaterialTheme.typography.titleSmall)
                         Spacer(Modifier.height(8.dp))
                         TextMMD(
                             text = "Nine thousand stars. This happens once.",
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.labelSmall,
                         )
                     }
                 } else {
@@ -102,7 +101,7 @@ fun ChartScreen(
                     TextMMD(
                         text = FACINGS.firstOrNull { it.second == state.facing }?.first
                             ?: "North up",
-                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 }
                 Spacer(Modifier.height(10.dp))
@@ -118,7 +117,7 @@ private fun Field(label: String, sub: String, onClick: () -> Unit, modifier: Mod
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
     ) {
-        TextMMD(text = label, fontSize = 14.sp)
-        TextMMD(text = sub, fontSize = 12.sp)
+        TextMMD(text = label, style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = sub, style = MaterialTheme.typography.labelSmall)
     }
 }
