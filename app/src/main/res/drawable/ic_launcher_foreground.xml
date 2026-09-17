@@ -13,7 +13,11 @@
      Each dot is two half-arcs. A single arc returning to its own start is degenerate and
      is dropped silently by the renderer, which is how all seven stars disappeared once.
 
-     Everything sits inside the central 66 units the launcher mask is certain to keep. -->
+     Everything sits inside the central 66 units the launcher mask is certain to keep. 
+     Weight, 2026-09-17: the joining line was 1.5 and fell to a grey thread at launcher size,
+     so the seven stars floated unconnected on the home screen. 2.4 keeps the stars the
+     subject - they are still the heavier element - while the line survives being small.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -25,7 +29,7 @@
          stars, and the mark stops being the Plough. -->
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="1.5"
+        android:strokeWidth="2.4"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:fillColor="#00000000"
