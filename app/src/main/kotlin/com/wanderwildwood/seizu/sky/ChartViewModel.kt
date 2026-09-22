@@ -19,6 +19,9 @@ data class ChartState(
     val longitude: Double = -0.0014,
     val facing: Int = 0,
     val zoom: Float = 1f,
+    /** How far the view has been dragged over the chart, in radii of the unzoomed disc. */
+    val panX: Float = 0f,
+    val panY: Float = 0f,
     /** Null means now, and the chart follows the clock when it is redrawn. */
     val fixedTime: GregorianCalendar? = null,
     val loading: Boolean = true,
@@ -98,12 +101,33 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(facing = next) }
     }
 
-    /** Zoom is drawing, not astronomy, so it never rebuilds the scene either. */
+    /**
+     * Zoom is drawing, not astronomy, so it never rebuilds the scene either.
+     *
+     * Zooming happens about the middle of the screen, and the pan is scaled with it, so
+     * whatever you had in the middle stays in the middle. Zooming about the zenith
+     * instead — which is what leaving the pan alone would do — walks the thing you were
+     * looking at off the edge on every press.
+     */
     fun zoomBy(factor: Float) {
-        _state.update { it.copy(zoom = (it.zoom * factor).coerceIn(1f, 8f)) }
+        _state.update { current ->
+            val zoom = (current.zoom * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
+            val scale = zoom / current.zoom
+            val (panX, panY) = clampPan(current.panX * scale, current.panY * scale, zoom)
+            current.copy(zoom = zoom, panX = panX, panY = panY)
+        }
     }
 
-    fun resetZoom() = _state.update { it.copy(zoom = 1f) }
+    /** Drag the view over the chart, in radii of the unzoomed disc. */
+    fun panBy(dx: Float, dy: Float) {
+        _state.update { current ->
+            val (panX, panY) = clampPan(current.panX + dx, current.panY + dy, current.zoom)
+            current.copy(panX = panX, panY = panY)
+        }
+    }
+
+    /** The whole sky on the screen again: the way out of being lost in a zoomed chart. */
+    fun resetView() = _state.update { it.copy(zoom = MIN_ZOOM, panX = 0f, panY = 0f) }
 
     fun select(objectAt: SkyObject?) = _state.update { it.copy(selected = objectAt) }
 }

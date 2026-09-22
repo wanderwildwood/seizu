@@ -22,6 +22,7 @@ import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.seizu.sky.Layers
+import com.wanderwildwood.seizu.sky.MarkWeight
 
 /**
  * What is drawn on the chart.
@@ -79,11 +80,45 @@ fun SettingsScreen(
                 }
             }
             item {
+                Row(
+                    title = "Mark weight",
+                    value = layers.markWeight.screenName,
+                    note = when (layers.markWeight) {
+                        MarkWeight.FINE -> "A hairline chart. Most sky, least ink."
+                        MarkWeight.MEDIUM -> "What a paper atlas prints at."
+                        MarkWeight.BOLD -> "For gloves, torchlight and tired eyes."
+                    },
+                ) {
+                    onLayers(layers.copy(markWeight = layers.markWeight.next()))
+                }
+            }
+            item {
                 HorizontalDividerMMD()
             }
             item {
                 Toggle("Constellation figures", layers.constellationLines) {
                     onLayers(layers.copy(constellationLines = it))
+                }
+            }
+            item {
+                Toggle("Constellation names", layers.constellationNames) {
+                    onLayers(layers.copy(constellationNames = it))
+                }
+            }
+            if (layers.constellationNames) {
+                item {
+                    Row(
+                        title = "Call them",
+                        value = layers.naming.screenName,
+                        note = "Andromeda, Chained Maiden, And.",
+                    ) {
+                        onLayers(layers.copy(naming = layers.naming.next()))
+                    }
+                }
+            }
+            item {
+                Toggle("Constellation boundaries", layers.constellationBoundaries) {
+                    onLayers(layers.copy(constellationBoundaries = it))
                 }
             }
             item {
@@ -112,6 +147,11 @@ fun SettingsScreen(
             }
             item {
                 Toggle("Declination grid", layers.grid) { onLayers(layers.copy(grid = it)) }
+            }
+            item {
+                Toggle("Altitude circles", layers.altitudeGrid) {
+                    onLayers(layers.copy(altitudeGrid = it))
+                }
             }
             item {
                 Spacer(Modifier.height(24.dp))

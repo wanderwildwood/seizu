@@ -30,9 +30,13 @@ for.
 
 - **Nine thousand stars** from the Yale Bright Star Catalogue, sized by magnitude. On a
   screen with no brightness to spare, size carries the whole of that information.
-- **The constellation figures**, and their names.
+- **The constellation figures**, their names — in Latin, in English or as the three-letter
+  abbreviation — and, if you want them, the IAU boundaries.
 - **Sun, Moon and the planets**, drawn as rings so they are never mistaken for stars.
-- **The ecliptic, the celestial equator and a declination grid**, each optional.
+- **The ecliptic, the celestial equator, a declination grid and circles of altitude**,
+  each optional.
+- **Zoom.** Pinch, or the − and + either side of the facing button; drag to move about;
+  double tap to put the whole sky back on the screen.
 - **Any moment, anywhere.** Set the time and the place by hand — the useful question is
   usually what will be up at ten tonight from a campsite next week, not what is overhead
   indoors right now.
@@ -48,6 +52,30 @@ The direction you are facing goes at the **bottom** of the chart, and the button
 turns the whole thing. A planisphere is held up over your head and read from underneath,
 which mirrors it — getting that backwards is how everyone ends up with Orion the wrong way
 round.
+
+## Drawing it small
+
+A 4.3" disc has to hold nine thousand stars, eighty-eight figures and their names, and it
+runs out of paper long before it runs out of sky. Three things keep it a chart rather than
+a smudge.
+
+**Hairlines.** Every mark is a multiple of one base width, and that base is about a
+pixel: a bright star is a dot you can see is bigger, not a blob. Nothing is drawn thinner
+than one pixel either, because a half-pixel line on a sixteen-grey panel is not a finer
+line, it is a grey one, and grey is the one thing E Ink will not hold still. **Mark
+weight** in the settings moves the whole drawing together — a hairline chart for indoors,
+a heavy one for gloves and torchlight.
+
+**Words that do not pile up.** Labels are collected as the chart is drawn and put down
+last, in order of what you are most likely to be looking for: the compass, then the
+planets, then the constellations, then the stars brightest first. A word that would land
+on a word already written is dropped rather than printed over it, and every word is
+knocked out of the drawing underneath in white, the way an engraver lifts a line out from
+under a name.
+
+**Somewhere to look.** Zoomed in, the rim and its four letters are off the panel, so the
+compass letters are pinned to the edge of the screen in the direction they actually lie.
+A chart you cannot orient is not a chart.
 
 ## What it does not do
 
@@ -71,6 +99,11 @@ key by design.
 ## Credit
 
 After [AndroidPlanisphere](https://github.com/tengel/AndroidPlanisphere) by Timo Engel.
+
+The layers came over with it: constellation names and boundaries, the azimuthal grid of
+altitude circles, the choice of what to call a constellation, and a setting for how heavy
+the marks are. What changed is what each is for on this screen — off by default where
+upstream has them on, because ink that is free on a phone is not free here.
 
 **The astronomy is his, and it is not rewritten.** `Astro.java`, `Kepler.java`,
 `Planet.java`, `Catalog.java` and `ConstellationDb.java` are kept in their original package

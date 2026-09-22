@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mudita.mmd.ThemeMMD
 import com.wanderwildwood.seizu.sky.ChartViewModel
+import com.wanderwildwood.seizu.sky.ZOOM_STEP
 import com.wanderwildwood.seizu.ui.ChartScreen
 import com.wanderwildwood.seizu.ui.LocationDialog
 import com.wanderwildwood.seizu.ui.ObjectDialog
@@ -87,6 +88,11 @@ private fun StarChart(viewModel: ChartViewModel = viewModel()) {
             onWhen = { whenOpen = true },
             onWhere = { whereOpen = true },
             onSelect = viewModel::select,
+            onZoomIn = { viewModel.zoomBy(ZOOM_STEP) },
+            onZoomOut = { viewModel.zoomBy(1f / ZOOM_STEP) },
+            onZoom = viewModel::zoomBy,
+            onPan = viewModel::panBy,
+            onResetView = viewModel::resetView,
         )
     }
 

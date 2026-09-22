@@ -69,7 +69,19 @@ data class SkyLine(
     override val elevation: Double get() = points.firstOrNull()?.get(1) ?: 0.0
 }
 
-enum class LineKind { CONSTELLATION, ECLIPTIC, EQUATOR, GRID }
+enum class LineKind { CONSTELLATION, BOUNDARY, ECLIPTIC, EQUATOR, GRID }
+
+/**
+ * A word with a place in the sky and no mark under it: a constellation's name.
+ *
+ * It carries a position rather than being worked out at drawing time because where the
+ * middle of a constellation is, is a question about the sky and not about the canvas.
+ */
+data class SkyLabel(
+    override val azimuth: Double,
+    override val elevation: Double,
+    override val label: String,
+) : SkyObject
 
 /**
  * Everything to be drawn for one moment at one place.
@@ -82,21 +94,67 @@ data class Scene(
     val stars: List<SkyStar> = emptyList(),
     val bodies: List<SkyBody> = emptyList(),
     val lines: List<SkyLine> = emptyList(),
+    val names: List<SkyLabel> = emptyList(),
     val whenText: String = "",
     val whereText: String = "",
 ) {
     val isEmpty: Boolean get() = stars.isEmpty() && bodies.isEmpty()
 }
 
+/**
+ * How heavy a mark the chart is drawn with.
+ *
+ * Upstream carries a star size and a font scale in its settings; this is the same choice
+ * put as one. It is a multiplier on every dot, ring and rule on the chart, so the whole
+ * drawing gets finer or heavier together rather than one part of it drifting away from
+ * the rest. Fine is a hairline chart for reading indoors with the panel clean; bold is
+ * for a cold night in gloves.
+ */
+enum class MarkWeight(val screenName: String, val scale: Float) {
+    FINE("Fine", 0.78f),
+    MEDIUM("Medium", 1f),
+    BOLD("Bold", 1.3f),
+    ;
+
+    fun next(): MarkWeight = entries[(ordinal + 1) % entries.size]
+}
+
+/**
+ * What a constellation is called on the chart.
+ *
+ * Upstream's setting, cut to the three that earn their space: the Latin name every atlas
+ * prints and every catalogue designation is built from, the English translation for
+ * anyone who would rather read "Great Bear" than "Ursa Major", and the three-letter
+ * abbreviation, which is often the only one that fits inside a small constellation on a
+ * 4.3" panel. Latin leads because Latin is what the sky is labelled in everywhere else.
+ *
+ * The numbers are columns in the catalogue's own name table, and its order is not this
+ * one: 0 is the abbreviation, 1 Latin, 2 English.
+ */
+enum class ConstellationNaming(val screenName: String, val column: Int) {
+    LATIN("Latin", 1),
+    ENGLISH("English", 2),
+    ABBREVIATION("Abbreviation", 0),
+    ;
+
+    fun next(): ConstellationNaming = entries[(ordinal + 1) % entries.size]
+}
+
 /** What the chart is showing, all of it optional except the stars. */
 data class Layers(
     val constellationLines: Boolean = true,
+    val constellationNames: Boolean = true,
+    val constellationBoundaries: Boolean = false,
+    val naming: ConstellationNaming = ConstellationNaming.LATIN,
     val starNames: Boolean = false,
     val solarSystem: Boolean = true,
     val solarNames: Boolean = true,
     val ecliptic: Boolean = false,
     val equator: Boolean = false,
     val grid: Boolean = false,
+    /** Circles of altitude and spokes of azimuth: upstream's azimuthal grid. */
+    val altitudeGrid: Boolean = false,
     /** Faintest star drawn. 6 is roughly the naked-eye limit under a dark sky. */
     val magnitudeLimit: Double = 5.0,
+    val markWeight: MarkWeight = MarkWeight.MEDIUM,
 )

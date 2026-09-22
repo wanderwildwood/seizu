@@ -79,6 +79,42 @@ class ProjectionTest {
         assertTrue("with south up, north goes to the top", y < turned.centreY)
     }
 
+    /**
+     * Panning moves the whole drawing under the window, zenith included.
+     *
+     * The zenith is the one point the projection would otherwise nail to the middle of
+     * the canvas, which is what makes a zoomed chart impossible to look around.
+     */
+    @Test
+    fun `panning moves the middle of the disc`() {
+        val panned = projection.copy(zoom = 2f, panX = 30f, panY = -20f)
+        val (x, y) = panned.project(0.0, 90.0)
+        assertEquals(170f, x, 1e-3f)
+        assertEquals(320f, y, 1e-3f)
+    }
+
+    @Test
+    fun `panning does not change how far apart two stars are`() {
+        val panned = projection.copy(zoom = 2f, panX = 30f, panY = -20f)
+        val plain = projection.copy(zoom = 2f)
+        val first = plain.project(40.0, 20.0)
+        val second = plain.project(200.0, 50.0)
+        val firstPanned = panned.project(40.0, 20.0)
+        val secondPanned = panned.project(200.0, 50.0)
+        assertEquals(
+            hypot(first.first - second.first, first.second - second.second),
+            hypot(firstPanned.first - secondPanned.first, firstPanned.second - secondPanned.second),
+            1e-3f,
+        )
+    }
+
+    @Test
+    fun `the rim is a whole disc away from the zenith`() {
+        assertEquals(0.0, projection.distanceFor(90.0), 1e-9)
+        assertEquals(100.0, projection.distanceFor(0.0), 1e-9)
+        assertEquals(200.0, projection.copy(zoom = 2f).distanceFor(0.0), 1e-9)
+    }
+
     @Test
     fun `zoom pushes the horizon outward but leaves the zenith alone`() {
         val zoomed = projection.copy(zoom = 2f)
@@ -87,6 +123,42 @@ class ProjectionTest {
             zoomed.project(0.0, 90.0).second - 300f,
         ), 1e-3f)
         assertEquals(200f, zoomed.horizonRadiusPx, 1e-3f)
+    }
+}
+
+/**
+ * Pan is what keeps a zoomed chart usable, and what could lose it altogether.
+ *
+ * Measured in radii of the unzoomed disc, so the limits are the same on any screen.
+ */
+class PanTest {
+
+    @Test
+    fun `there is nowhere to pan when the whole sky is on the screen`() {
+        val (x, y) = clampPan(4f, -3f, 1f)
+        assertEquals(0f, x, 1e-6f)
+        assertEquals(0f, y, 1e-6f)
+    }
+
+    @Test
+    fun `a pan within the limit is left alone`() {
+        val (x, y) = clampPan(0.5f, -0.5f, 3f)
+        assertEquals(0.5f, x, 1e-6f)
+        assertEquals(-0.5f, y, 1e-6f)
+    }
+
+    /** Clamped as a distance, not axis by axis: the chart is round. */
+    @Test
+    fun `a pan past the limit is pulled back along its own line`() {
+        val (x, y) = clampPan(30f, 40f, 3f)
+        assertEquals(2f, hypot(x, y), 1e-5f)
+        assertEquals(x / y, 30f / 40f, 1e-5f)
+    }
+
+    @Test
+    fun `the limit grows with the zoom`() {
+        assertEquals(1f, hypot(clampPan(9f, 0f, 2f).first, clampPan(9f, 0f, 2f).second), 1e-5f)
+        assertEquals(7f, hypot(clampPan(9f, 0f, 8f).first, clampPan(9f, 0f, 8f).second), 1e-5f)
     }
 }
 
@@ -103,13 +175,112 @@ class StarSizeTest {
     }
 
     @Test
-    fun `the sun is the largest thing on the chart`() {
-        assertTrue(starRadius(-26.7, 1f) > starRadius(-1.46, 1f))
+    fun `the ladder never goes back up`() {
+        val magnitudes = listOf(-26.7, -1.46, -0.7, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0)
+        magnitudes.zipWithNext().forEach { (brighter, fainter) ->
+            assertTrue(
+                "magnitude $fainter should not out-draw $brighter",
+                starRadius(brighter, 1f) >= starRadius(fainter, 1f),
+            )
+        }
+    }
+
+    /**
+     * The whole ladder spans the six magnitudes of star the chart shows, and no more.
+     *
+     * Upstream spends four rungs of its ladder above magnitude -1, where the only things
+     * are the Sun and the Moon. Those are drawn by [bodyRadius] here, so a star four
+     * times the width of the faintest one is as heavy as the chart ever gets.
+     */
+    @Test
+    fun `the brightest star is not many times the faintest`() {
+        assertTrue(starRadius(-1.5, 1f) <= 4f * starRadius(6.5, 1f))
     }
 
     @Test
     fun `nothing is drawn at zero size`() {
         assertTrue(starRadius(30.0, 1f) > 0f)
+    }
+
+    @Test
+    fun `the sun and moon are drawn larger than any star`() {
+        assertTrue(bodyRadius(BodyKind.SUN, -26.7, 1f) > starRadius(-1.46, 1f))
+        assertTrue(bodyRadius(BodyKind.MOON, -12.7, 1f) > starRadius(-1.46, 1f))
+    }
+
+    /** A planet has to carry a ring round it, so it starts bigger than a bright star. */
+    @Test
+    fun `a planet is larger than the brightest star`() {
+        assertTrue(bodyRadius(BodyKind.PLANET, 5.0, 1f) > starRadius(-1.46, 1f))
+    }
+
+    @Test
+    fun `a brighter planet is drawn larger`() {
+        assertTrue(
+            bodyRadius(BodyKind.PLANET, -4.0, 1f) > bodyRadius(BodyKind.PLANET, 1.0, 1f),
+        )
+    }
+
+    @Test
+    fun `mark weight scales everything together`() {
+        val fine = MarkWeight.FINE.scale
+        val bold = MarkWeight.BOLD.scale
+        assertTrue(fine < bold)
+        assertEquals(
+            starRadius(2.0, bold) / starRadius(2.0, fine),
+            bodyRadius(BodyKind.SUN, -26.7, bold) / bodyRadius(BodyKind.SUN, -26.7, fine),
+            1e-5f,
+        )
+    }
+}
+
+/**
+ * Where a constellation's name goes, which is a question about the sphere.
+ *
+ * Averaging right ascension as a number is the trap: it is an angle that wraps, and a
+ * constellation straddling 0h averages out to the far side of the sky, which is how a
+ * name ends up under a different constellation with nothing on the screen looking wrong.
+ */
+class MeanDirectionTest {
+
+    private fun point(raHours: Double, declination: Double) =
+        doubleArrayOf(raHours, declination)
+
+    @Test
+    fun `an empty scatter has no middle`() {
+        assertEquals(null, meanDirection(emptyList()))
+    }
+
+    @Test
+    fun `one point is its own middle`() {
+        val middle = meanDirection(listOf(point(6.0, 30.0)))!!
+        assertEquals(6.0, middle[0], 1e-6)
+        assertEquals(30.0, middle[1], 1e-6)
+    }
+
+    @Test
+    fun `the middle of two hour angles is between them`() {
+        val middle = meanDirection(listOf(point(4.0, 0.0), point(6.0, 0.0)))!!
+        assertEquals(5.0, middle[0], 1e-6)
+        assertEquals(0.0, middle[1], 1e-6)
+    }
+
+    @Test
+    fun `a scatter across zero hours averages to zero hours and not to noon`() {
+        val middle = meanDirection(listOf(point(23.0, 0.0), point(1.0, 0.0)))!!
+        assertEquals(0.0, middle[0], 1e-6)
+    }
+
+    @Test
+    fun `declination is averaged too`() {
+        val middle = meanDirection(listOf(point(12.0, 20.0), point(12.0, 40.0)))!!
+        assertEquals(12.0, middle[0], 1e-6)
+        assertEquals(30.0, middle[1], 1e-6)
+    }
+
+    @Test
+    fun `a scatter that cancels itself out has no middle`() {
+        assertEquals(null, meanDirection(listOf(point(0.0, 90.0), point(0.0, -90.0))))
     }
 }
 

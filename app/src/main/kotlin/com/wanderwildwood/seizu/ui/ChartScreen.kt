@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -21,6 +22,7 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.seizu.sky.ChartState
 import com.wanderwildwood.seizu.sky.FACINGS
+import com.wanderwildwood.seizu.sky.MIN_ZOOM
 
 /**
  * The chart, and underneath it the two facts that decide what is on it.
@@ -38,6 +40,11 @@ fun ChartScreen(
     onWhen: () -> Unit,
     onWhere: () -> Unit,
     onSelect: (com.wanderwildwood.seizu.sky.SkyObject?) -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+    onZoom: (Float) -> Unit,
+    onPan: (Float, Float) -> Unit,
+    onResetView: () -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -71,7 +78,12 @@ fun ChartScreen(
                         layers = state.layers,
                         facing = state.facing,
                         zoom = state.zoom,
+                        panX = state.panX,
+                        panY = state.panY,
                         onSelect = onSelect,
+                        onZoom = onZoom,
+                        onPan = onPan,
+                        onResetView = onResetView,
                     )
                 }
             }
@@ -94,15 +106,43 @@ fun ChartScreen(
 
                 Spacer(Modifier.height(6.dp))
 
-                OutlinedButtonMMD(
-                    onClick = onFacing,
-                    modifier = Modifier.fillMaxWidth().height(44.dp),
-                ) {
-                    TextMMD(
-                        text = FACINGS.firstOrNull { it.second == state.facing }?.first
-                            ?: "North up",
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+                // Which way the chart is turned, with the zoom either side of it: the
+                // three things you change while standing outside holding the phone up,
+                // on one row under your thumb. Pinching works too, but a pinch on a panel
+                // this size is a two-handed job in the dark.
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButtonMMD(
+                        onClick = onZoomOut,
+                        modifier = Modifier.width(56.dp).height(44.dp),
+                    ) { TextMMD(text = "\u2212", style = MaterialTheme.typography.bodyMedium) }
+
+                    Spacer(Modifier.width(6.dp))
+
+                    OutlinedButtonMMD(
+                        onClick = onFacing,
+                        modifier = Modifier.weight(1f).height(44.dp),
+                    ) {
+                        val facing = FACINGS.firstOrNull { it.second == state.facing }?.first
+                            ?: "North up"
+                        TextMMD(
+                            // The zoom is shown only when there is some, and it is shown
+                            // here rather than on the chart: a number floating over the
+                            // sky is one more mark to read past.
+                            text = if (state.zoom > MIN_ZOOM * 1.05f) {
+                                "%s  ×%.1f".format(facing, state.zoom)
+                            } else {
+                                facing
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
+
+                    Spacer(Modifier.width(6.dp))
+
+                    OutlinedButtonMMD(
+                        onClick = onZoomIn,
+                        modifier = Modifier.width(56.dp).height(44.dp),
+                    ) { TextMMD(text = "+", style = MaterialTheme.typography.bodyMedium) }
                 }
                 Spacer(Modifier.height(10.dp))
             }

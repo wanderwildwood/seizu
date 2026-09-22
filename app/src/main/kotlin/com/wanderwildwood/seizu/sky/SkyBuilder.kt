@@ -9,6 +9,11 @@ import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
 
 /**
  * Turns a time and a place into a [Scene].
@@ -59,8 +64,13 @@ class SkyBuilder(
             .toList()
 
         val lines = buildList {
+            // Boundaries first so that everything else is drawn over them: they are the
+            // faintest thing on the chart and the only one that covers the whole sky.
+            if (layers.constellationBoundaries) {
+                addAll(constellationBoundaries(::toHorizontal))
+            }
             if (layers.constellationLines) {
-                addAll(constellationLines(::toHorizontal))
+                addAll(constellationLines(layers.naming, ::toHorizontal))
             }
             if (layers.equator) {
                 add(circleOfDeclination(0.0, LineKind.EQUATOR, ::toHorizontal))
@@ -82,10 +92,17 @@ class SkyBuilder(
             emptyList()
         }
 
+        val names = if (layers.constellationNames) {
+            constellationNames(layers.naming, ::toHorizontal)
+        } else {
+            emptyList()
+        }
+
         return Scene(
             stars = stars,
             bodies = bodies,
             lines = lines,
+            names = names,
             whenText = WHEN_FORMAT.format(time.time),
             whereText = placeText(latitude, longitude),
         )
@@ -115,6 +132,7 @@ class SkyBuilder(
     }
 
     private fun constellationLines(
+        naming: ConstellationNaming,
         toHorizontal: (Double, Double) -> DoubleArray,
     ): List<SkyLine> = constellations.get().mapNotNull { constellation ->
         val points = constellation.mLine.map { entry ->
@@ -124,7 +142,65 @@ class SkyBuilder(
         // some above is drawn whole, so a figure rising over the horizon is not chopped
         // into disconnected fragments that read as a different shape.
         if (points.none { it[1] >= 0 }) null
-        else SkyLine(points, LineKind.CONSTELLATION, constellations.getName(constellation.mName, 2))
+        else SkyLine(
+            points,
+            LineKind.CONSTELLATION,
+            constellations.getName(constellation.mName, naming.column),
+        )
+    }
+
+    /**
+     * The outlines the IAU drew round the constellations, closed back to their first point.
+     *
+     * Upstream's layer, and upstream's data file. Where the figure lines say what a
+     * constellation looks like, these say where it ends, which is the only way to answer
+     * "which constellation is that in" from a chart. Off by default: eighty-eight
+     * polygons is a great deal of ink for a 4.3" panel.
+     */
+    private fun constellationBoundaries(
+        toHorizontal: (Double, Double) -> DoubleArray,
+    ): List<SkyLine> = constellations.get().mapNotNull { constellation ->
+        val vertices = constellations.getBoundary(constellation.mName).orEmpty()
+        if (vertices.isEmpty()) return@mapNotNull null
+        val points = buildList {
+            vertices.forEach { add(toHorizontal(it[0], it[1])) }
+            // Closed back to where it started: the last side of the polygon is a boundary
+            // like every other, and leaving it out opens a gap in the one layer whose
+            // whole job is to say where one constellation stops and the next begins.
+            val first = vertices.first()
+            add(toHorizontal(first[0], first[1]))
+        }
+        if (points.none { it[1] >= 0 }) null else SkyLine(points, LineKind.BOUNDARY)
+    }
+
+    /**
+     * Where each constellation's name goes.
+     *
+     * In the middle of its boundary, as upstream does it, but averaged on the sphere
+     * rather than in screen pixels: a constellation whose boundary crosses 0h right
+     * ascension averages out to the opposite side of the sky if the numbers are simply
+     * added up, and a constellation halfway over the horizon would drag its own name down
+     * to the rim if the middle were taken of the part that happens to be showing.
+     *
+     * A constellation with no boundary in the file falls back to the middle of its figure,
+     * so it is still named rather than silently left out.
+     */
+    private fun constellationNames(
+        naming: ConstellationNaming,
+        toHorizontal: (Double, Double) -> DoubleArray,
+    ): List<SkyLabel> = constellations.get().mapNotNull { constellation ->
+        val boundary = constellations.getBoundary(constellation.mName)
+            ?.map { doubleArrayOf(it[0], it[1]) }
+            .orEmpty()
+        val figure = constellation.mLine.map {
+            doubleArrayOf(it.rightAscension, it.declination)
+        }
+        val centre = meanDirection(boundary.ifEmpty { figure }) ?: return@mapNotNull null
+        val position = toHorizontal(centre[0], centre[1])
+        // Named only while the middle of it is properly up. A name sitting on the rim
+        // belongs to a constellation that is three-quarters below the horizon.
+        if (position[1] < NAME_FLOOR) return@mapNotNull null
+        SkyLabel(position[0], position[1], constellations.getName(constellation.mName, naming.column))
     }
 
     /** A circle of constant declination, traced right around the sky. */
@@ -206,6 +282,9 @@ class SkyBuilder(
     }
 
     private companion object {
+        /** Degrees above the horizon the middle of a constellation must be, to be named. */
+        const val NAME_FLOOR = 4.0
+
         val WHEN_FORMAT = SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault())
 
         fun placeText(latitude: Double, longitude: Double): String {
@@ -214,4 +293,35 @@ class SkyBuilder(
             return "%.2f°%s %.2f°%s".format(abs(latitude), ns, abs(longitude), ew)
         }
     }
+}
+
+/**
+ * The middle of a scatter of sky positions, as a direction rather than as two averages.
+ *
+ * Each (right ascension in hours, declination in degrees) is turned into a unit vector,
+ * the vectors are added, and the sum is turned back. Averaging the two numbers instead
+ * works everywhere except across 0h and near the poles, which is to say it works
+ * everywhere except where it matters: the mean of 23h and 1h is noon, on the far side of
+ * the sky from both.
+ *
+ * Null for an empty list, and for the vanishingly unlikely scatter that cancels itself
+ * out exactly and so has no middle to point at.
+ */
+fun meanDirection(raDecDegrees: List<DoubleArray>): DoubleArray? {
+    if (raDecDegrees.isEmpty()) return null
+    var x = 0.0
+    var y = 0.0
+    var z = 0.0
+    raDecDegrees.forEach { point ->
+        val ra = Math.toRadians(point[0] * 15.0)
+        val dec = Math.toRadians(point[1])
+        x += cos(dec) * cos(ra)
+        y += cos(dec) * sin(ra)
+        z += sin(dec)
+    }
+    val length = hypot(hypot(x, y), z)
+    if (length < 1e-9) return null
+    val declination = Math.toDegrees(asin(z / length))
+    val rightAscension = Math.toDegrees(atan2(y, x)) / 15.0
+    return doubleArrayOf((rightAscension + 24.0) % 24.0, declination)
 }
