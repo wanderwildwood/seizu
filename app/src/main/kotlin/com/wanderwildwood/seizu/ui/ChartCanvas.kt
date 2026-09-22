@@ -32,6 +32,8 @@ import com.wanderwildwood.seizu.sky.BodyKind
 import com.wanderwildwood.seizu.sky.CARDINALS
 import com.wanderwildwood.seizu.sky.LineKind
 import com.wanderwildwood.seizu.sky.Layers
+import com.wanderwildwood.seizu.sky.MOON_FULL_ABOVE
+import com.wanderwildwood.seizu.sky.MOON_NEW_BELOW
 import com.wanderwildwood.seizu.sky.MarkWeight
 import com.wanderwildwood.seizu.sky.MoonPhase
 import com.wanderwildwood.seizu.sky.Projection
@@ -433,8 +435,8 @@ private fun DrawScope.drawMoonPhase(centre: Offset, radius: Float, phase: MoonPh
     val lit = phase.illuminated.toFloat()
     // Within a pixel of either end there is no crescent to draw, and the ellipse below
     // degenerates. New stays the empty ring the other bodies get; full is simply filled.
-    if (lit <= 0.03f) return
-    if (lit >= 0.97f) {
+    if (lit < MOON_NEW_BELOW.toFloat()) return
+    if (lit > MOON_FULL_ABOVE.toFloat()) {
         drawCircle(Color.Black, radius = radius, center = centre)
         return
     }

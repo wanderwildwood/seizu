@@ -20,6 +20,7 @@ import com.wanderwildwood.seizu.BuildConfig
 import com.wanderwildwood.seizu.sky.BodyKind
 import com.wanderwildwood.seizu.sky.SkyBody
 import com.wanderwildwood.seizu.sky.SkyObject
+import com.wanderwildwood.seizu.sky.phaseName
 import com.wanderwildwood.seizu.sky.steppedTime
 import com.wanderwildwood.seizu.sky.SkyStar
 import java.util.GregorianCalendar
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.wanderwildwood.seizu.R
+import kotlin.math.roundToInt
 
 /**
  * Where you are.
@@ -257,6 +259,14 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
                     }
                 )
                 Line("Magnitude", "%.2f".format(objectAt.magnitude))
+                // Only the Moon has one, and it is the thing worth knowing about it: the
+                // mark can show roughly how much is lit, but not how much to the percent.
+                objectAt.phase?.let { phase ->
+                    Line(
+                        "Phase",
+                        "%s, %d%% lit".format(phaseName(phase), (phase.illuminated * 100).roundToInt()),
+                    )
+                }
             }
 
             else -> Unit

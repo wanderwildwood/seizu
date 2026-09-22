@@ -75,6 +75,29 @@ data class MoonPhase(
 )
 
 /**
+ * Where the Moon stops being a crescent and becomes new, and where it becomes full.
+ *
+ * Shared by the drawing and the naming so the mark and the word can never disagree: a
+ * disc drawn solid and a line reading "waning gibbous" would be one of them lying.
+ */
+const val MOON_NEW_BELOW = 0.03
+const val MOON_FULL_ABOVE = 0.97
+
+/**
+ * What an almanac would call this phase.
+ *
+ * The quarters are instants rather than ranges, so they get the half-day either side that
+ * a chart can actually distinguish; everything else falls where it falls.
+ */
+fun phaseName(phase: MoonPhase): String = when {
+    phase.illuminated < MOON_NEW_BELOW -> "new"
+    phase.illuminated > MOON_FULL_ABOVE -> "full"
+    phase.illuminated < 0.48 -> if (phase.waxing) "waxing crescent" else "waning crescent"
+    phase.illuminated <= 0.52 -> if (phase.waxing) "first quarter" else "last quarter"
+    else -> if (phase.waxing) "waxing gibbous" else "waning gibbous"
+}
+
+/**
  * The Moon's phase, from where the Sun and the Moon are on the ecliptic.
  *
  * Elongation is the angle between them as seen from here, and the lit fraction follows

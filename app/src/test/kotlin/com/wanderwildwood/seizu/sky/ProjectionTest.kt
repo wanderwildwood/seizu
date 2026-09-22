@@ -447,6 +447,30 @@ class MoonPhaseTest {
     }
 
     @Test
+    fun `each phase gets the name an almanac would print`() {
+        fun name(sun: Double, moon: Double) = phaseName(moonPhase(sun, moon, 0.0))
+        assertEquals("new", name(0.0, 0.0))
+        assertEquals("waxing crescent", name(0.0, 45.0))
+        assertEquals("first quarter", name(0.0, 90.0))
+        assertEquals("waxing gibbous", name(0.0, 135.0))
+        assertEquals("full", name(0.0, 180.0))
+        assertEquals("waning gibbous", name(0.0, 225.0))
+        assertEquals("last quarter", name(0.0, 270.0))
+        assertEquals("waning crescent", name(0.0, 315.0))
+    }
+
+    @Test
+    fun `the name and the drawing agree about new and full`() {
+        // The canvas draws an empty ring below one threshold and a solid disc above the
+        // other. If the words used different numbers, a solid disc could be called
+        // gibbous, which is the one way this can be wrong without looking wrong.
+        assertEquals("new", phaseName(MoonPhase(MOON_NEW_BELOW - 0.001, waxing = true)))
+        assertEquals("full", phaseName(MoonPhase(MOON_FULL_ABOVE + 0.001, waxing = true)))
+        assertTrue(phaseName(MoonPhase(MOON_NEW_BELOW + 0.001, waxing = true)) != "new")
+        assertTrue(phaseName(MoonPhase(MOON_FULL_ABOVE - 0.001, waxing = true)) != "full")
+    }
+
+    @Test
     fun `the Moon's own latitude never lights more than the angle allows`() {
         // At full, five degrees off the ecliptic leaves it a shade short of wholly lit.
         val phase = moonPhase(sunLongitude = 0.0, moonLongitude = 180.0, moonLatitude = 5.0)
