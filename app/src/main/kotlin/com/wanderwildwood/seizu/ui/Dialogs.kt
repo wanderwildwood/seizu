@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.wanderwildwood.seizu.R
 import kotlin.math.roundToInt
 
@@ -61,19 +62,19 @@ fun LocationDialog(
     var bad by remember { mutableStateOf(false) }
 
     EInkDialog(onDismiss = onDismiss) {
-        TextMMD(text = "Where", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+        TextMMD(text = stringResource(R.string.where_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
 
-        TextMMD(text = "Latitude, degrees north", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.where_latitude), style = MaterialTheme.typography.labelSmall)
         TextFieldMMD(value = lat, onValueChange = { lat = it; bad = false })
         Spacer(Modifier.height(10.dp))
-        TextMMD(text = "Longitude, degrees east", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.where_longitude), style = MaterialTheme.typography.labelSmall)
         TextFieldMMD(value = lon, onValueChange = { lon = it; bad = false })
 
         if (bad) {
             Spacer(Modifier.height(8.dp))
             TextMMD(
-                text = "Latitude runs -90 to 90, longitude -180 to 180.",
+                text = stringResource(R.string.where_out_of_range),
                 style = MaterialTheme.typography.labelSmall,
             )
         }
@@ -90,20 +91,19 @@ fun LocationDialog(
                 }
             },
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Use this", style = MaterialTheme.typography.bodySmall) }
+        ) { TextMMD(text = stringResource(R.string.where_use_this), style = MaterialTheme.typography.bodySmall) }
 
         if (canUseGps) {
             Spacer(Modifier.height(8.dp))
             OutlinedButtonMMD(
                 onClick = onUseGps,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
-            ) { TextMMD(text = "Ask the GPS", style = MaterialTheme.typography.bodySmall) }
+            ) { TextMMD(text = stringResource(R.string.where_ask_gps), style = MaterialTheme.typography.bodySmall) }
 
             if (noFix) {
                 Spacer(Modifier.height(8.dp))
                 TextMMD(
-                    text = "The phone has no recent fix. Step outside and try again, " +
-                        "or set it by hand \u2014 a chart is not fussy about a mile.",
+                    text = stringResource(R.string.where_no_fix),
                     style = MaterialTheme.typography.labelSmall,
                 )
             }
@@ -113,7 +113,7 @@ fun LocationDialog(
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Cancel", style = MaterialTheme.typography.bodySmall) }
+        ) { TextMMD(text = stringResource(R.string.where_cancel), style = MaterialTheme.typography.bodySmall) }
     }
 }
 
@@ -159,12 +159,12 @@ fun TimeDialog(
     }
 
     EInkDialog(onDismiss = onDismiss) {
-        TextMMD(text = "When", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+        TextMMD(text = stringResource(R.string.when_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
 
         // Three fields on the line their label already describes, rather than stacked: a
         // date is one fact, and stacked it took two thirds of the dialog's height for it.
-        TextMMD(text = "Year, month, day", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.when_date), style = MaterialTheme.typography.labelSmall)
         Row(modifier = Modifier.fillMaxWidth()) {
             TextFieldMMD(value = year, onValueChange = { year = it; bad = false }, modifier = Modifier.weight(1.4f))
             Spacer(Modifier.width(6.dp))
@@ -173,7 +173,7 @@ fun TimeDialog(
             TextFieldMMD(value = day, onValueChange = { day = it; bad = false }, modifier = Modifier.weight(1f))
         }
         Spacer(Modifier.height(8.dp))
-        TextMMD(text = "Hour and minute, on this phone's clock", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.when_time), style = MaterialTheme.typography.labelSmall)
         Row(modifier = Modifier.fillMaxWidth()) {
             TextFieldMMD(value = hour, onValueChange = { hour = it; bad = false }, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(6.dp))
@@ -182,18 +182,18 @@ fun TimeDialog(
 
         if (bad) {
             Spacer(Modifier.height(8.dp))
-            TextMMD(text = "That is not a date this can chart.", style = MaterialTheme.typography.labelSmall)
+            TextMMD(text = stringResource(R.string.when_bad_date), style = MaterialTheme.typography.labelSmall)
         }
 
         Spacer(Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
-            StepButton("\u2212 day", Modifier.weight(1f)) { step(0, -1) }
+            StepButton(stringResource(R.string.when_step_back_day), Modifier.weight(1f)) { step(0, -1) }
             Spacer(Modifier.width(6.dp))
-            StepButton("\u2212 hr", Modifier.weight(1f)) { step(-1, 0) }
+            StepButton(stringResource(R.string.when_step_back_hour), Modifier.weight(1f)) { step(-1, 0) }
             Spacer(Modifier.width(6.dp))
-            StepButton("+ hr", Modifier.weight(1f)) { step(1, 0) }
+            StepButton(stringResource(R.string.when_step_forward_hour), Modifier.weight(1f)) { step(1, 0) }
             Spacer(Modifier.width(6.dp))
-            StepButton("+ day", Modifier.weight(1f)) { step(0, 1) }
+            StepButton(stringResource(R.string.when_step_forward_day), Modifier.weight(1f)) { step(0, 1) }
         }
 
         Spacer(Modifier.height(12.dp))
@@ -213,19 +213,19 @@ fun TimeDialog(
                 }
             },
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Chart this moment", style = MaterialTheme.typography.bodySmall) }
+        ) { TextMMD(text = stringResource(R.string.when_chart_this_moment), style = MaterialTheme.typography.bodySmall) }
 
         Spacer(Modifier.height(8.dp))
         OutlinedButtonMMD(
             onClick = { onSet(null) },
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Back to now", style = MaterialTheme.typography.bodySmall) }
+        ) { TextMMD(text = stringResource(R.string.when_back_to_now), style = MaterialTheme.typography.bodySmall) }
 
         Spacer(Modifier.height(8.dp))
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Cancel", style = MaterialTheme.typography.bodySmall) }
+        ) { TextMMD(text = stringResource(R.string.when_cancel), style = MaterialTheme.typography.bodySmall) }
     }
 }
 
@@ -236,7 +236,7 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
         val title = when (objectAt) {
             is SkyStar -> objectAt.label ?: "HR ${objectAt.hr}"
             is SkyBody -> objectAt.label
-            else -> "Object"
+            else -> stringResource(R.string.object_title_fallback)
         }
         TextMMD(text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
@@ -244,27 +244,27 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
         when (objectAt) {
             is SkyStar -> {
                 if (objectAt.designation.isNotBlank()) {
-                    Line("Designation", objectAt.designation)
+                    Line(stringResource(R.string.object_designation), objectAt.designation)
                 }
-                Line("Catalogue", "HR ${objectAt.hr}")
-                Line("Magnitude", "%.2f".format(objectAt.magnitude))
+                Line(stringResource(R.string.object_catalogue), "HR ${objectAt.hr}")
+                Line(stringResource(R.string.object_magnitude), "%.2f".format(objectAt.magnitude))
             }
 
             is SkyBody -> {
                 Line(
-                    "Kind", when (objectAt.kind) {
-                        BodyKind.SUN -> "The Sun"
-                        BodyKind.MOON -> "The Moon"
-                        BodyKind.PLANET -> "Planet"
+                    stringResource(R.string.object_kind), when (objectAt.kind) {
+                        BodyKind.SUN -> stringResource(R.string.object_kind_sun)
+                        BodyKind.MOON -> stringResource(R.string.object_kind_moon)
+                        BodyKind.PLANET -> stringResource(R.string.object_kind_planet)
                     }
                 )
-                Line("Magnitude", "%.2f".format(objectAt.magnitude))
+                Line(stringResource(R.string.object_magnitude), "%.2f".format(objectAt.magnitude))
                 // Only the Moon has one, and it is the thing worth knowing about it: the
                 // mark can show roughly how much is lit, but not how much to the percent.
                 objectAt.phase?.let { phase ->
                     Line(
-                        "Phase",
-                        "%s, %d%% lit".format(phaseName(phase), (phase.illuminated * 100).roundToInt()),
+                        stringResource(R.string.object_phase),
+                        stringResource(R.string.object_phase_value, phaseName(phase), (phase.illuminated * 100).roundToInt()),
                     )
                 }
             }
@@ -272,20 +272,20 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
             else -> Unit
         }
 
-        Line("Altitude", "%.1f° above the horizon".format(objectAt.elevation))
-        Line("Azimuth", "%.1f° from north".format(objectAt.azimuth))
+        Line(stringResource(R.string.object_altitude), stringResource(R.string.object_altitude_value, objectAt.elevation))
+        Line(stringResource(R.string.object_azimuth), stringResource(R.string.object_azimuth_value, objectAt.azimuth))
 
         Spacer(Modifier.height(16.dp))
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Close", style = MaterialTheme.typography.bodySmall) }
+        ) { TextMMD(text = stringResource(R.string.object_close), style = MaterialTheme.typography.bodySmall) }
     }
 }
 
 @Composable
 private fun Line(label: String, value: String) {
-    TextMMD(text = "$label: $value", style = MaterialTheme.typography.labelSmall)
+    TextMMD(text = stringResource(R.string.object_line, label, value), style = MaterialTheme.typography.labelSmall)
     Spacer(Modifier.height(4.dp))
 }
 
@@ -293,35 +293,32 @@ private fun Line(label: String, value: String) {
 fun AboutDialog(onDismiss: () -> Unit) {
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(
-            text = "Star Chart ${BuildConfig.VERSION_NAME}",
+            text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Medium,
         )
 
         Spacer(Modifier.height(14.dp))
         TextMMD(
-            text = "Black on white, like a paper chart. A screen full of black would be " +
-                "unreadable outdoors and slow to redraw here.",
+            text = stringResource(R.string.about_black_on_white),
             style = MaterialTheme.typography.labelSmall,
         )
 
         Spacer(Modifier.height(14.dp))
         TextMMD(
-            text = "Stars from the Yale Bright Star Catalogue. Positions are computed on " +
-                "the phone; nothing is fetched and nothing is sent.",
+            text = stringResource(R.string.about_privacy),
             style = MaterialTheme.typography.labelSmall,
         )
 
         Spacer(Modifier.height(14.dp))
         TextMMD(
-            text = "After AndroidPlanisphere by Timo Engel, whose astronomy this runs on " +
-                "unchanged.",
+            text = stringResource(R.string.about_after),
             style = MaterialTheme.typography.labelSmall,
         )
 
         Spacer(Modifier.height(14.dp))
-        TextMMD(text = "GNU General Public License v3 or later", style = MaterialTheme.typography.labelSmall)
-        TextMMD(text = "Icons from Material Symbols, Apache 2.0", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.about_licence), style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.about_icons), style = MaterialTheme.typography.labelSmall)
 
         Spacer(Modifier.height(14.dp))
         TextMMD(text = "github.com/wanderwildwood/seizu", style = MaterialTheme.typography.labelSmall)
@@ -333,7 +330,7 @@ fun AboutDialog(onDismiss: () -> Unit) {
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Close", style = MaterialTheme.typography.bodySmall) }
+        ) { TextMMD(text = stringResource(R.string.about_close), style = MaterialTheme.typography.bodySmall) }
     }
 }
 
@@ -365,7 +362,7 @@ private fun Llama() {
                         Intent(Intent.ACTION_VIEW, Uri.parse("https://square.link/u/AGu8oT10")),
                     )
                 }.onFailure {
-                    Toast.makeText(context, "There is no browser on this phone to open that with.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.about_no_browser), Toast.LENGTH_SHORT).show()
                 }
             }
             .padding(vertical = 4.dp),
@@ -376,7 +373,7 @@ private fun Llama() {
             modifier = Modifier.size(22.dp),
         )
         Spacer(Modifier.width(6.dp))
-        TextMMD(text = "Feed the llamas", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.about_feed_the_llamas), style = MaterialTheme.typography.labelSmall)
     }
 }
 

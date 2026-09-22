@@ -1,4 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Star Chart</string>
+
+    <!-- ============================================================ -->
+    <!-- Chart screen: the chart, and when and where under it -->
+
+    <!-- Top bar title: the app's name -->
+    <string name="chart_title">Star Chart</string>
+    <!-- Cog button in the top bar, read aloud by a screen reader -->
+    <string name="chart_cd_settings">Settings</string>
+    <!-- Shown once, while the star catalogue loads on first start -->
+    <string name="chart_loading">Reading the catalogue…</string>
+    <string name="chart_loading_note">Nine thousand stars. This happens once.</string>
+
+    <!-- The when and where fields under the chart: a value, then a qualifier after a dot. %1$s is the value, %2$s the qualifier -->
+    <string name="chart_field">%1$s · %2$s</string>
+    <!-- The when field's value before a time has been worked out (the present moment) -->
+    <string name="chart_when_now_label">Now</string>
+    <!-- Qualifier: the chart follows the clock (lower case, after the dot) -->
+    <string name="chart_when_sub_now">now</string>
+    <!-- Qualifier: the chart shows a moment the reader chose (past participle, "set by you"; lower case) -->
+    <string name="chart_when_sub_set">set</string>
+    <!-- Qualifier: the place came from the GPS -->
+    <string name="chart_where_sub_gps">GPS</string>
+    <!-- Qualifier: the place was typed in -->
+    <string name="chart_where_sub_by_hand">by hand</string>
+
+    <!-- ============================================================ -->
+    <!-- Where dialog: the place the sky is charted from -->
+
+    <string name="where_title">Where</string>
+    <!-- Labels above the two number fields -->
+    <string name="where_latitude">Latitude, degrees north</string>
+    <string name="where_longitude">Longitude, degrees east</string>
+    <string name="where_out_of_range">Latitude runs -90 to 90, longitude -180 to 180.</string>
+    <!-- Button: chart from the typed place -->
+    <string name="where_use_this">Use this</string>
+    <string name="where_ask_gps">Ask the GPS</string>
+    <string name="where_no_fix">The phone has no recent fix. Step outside and try again, or set it by hand — a chart is not fussy about a mile.</string>
+    <string name="where_cancel">Cancel</string>
+
+    <!-- ============================================================ -->
+    <!-- When dialog: the moment the sky is charted for -->
+
+    <string name="when_title">When</string>
+    <!-- Label above three fields: year, month and day, in that order -->
+    <string name="when_date">Year, month, day</string>
+    <!-- Label above two fields: hour and minute, in the phone's time zone -->
+    <string name="when_time">Hour and minute, on this phone\'s clock</string>
+    <string name="when_bad_date">That is not a date this can chart.</string>
+    <!-- Four small step buttons: back a day, back an hour, forward an hour, forward a day. Keep them short; the minus is U+2212 -->
+    <string name="when_step_back_day">− day</string>
+    <string name="when_step_back_hour">− hr</string>
+    <string name="when_step_forward_hour">+ hr</string>
+    <string name="when_step_forward_day">+ day</string>
+    <string name="when_chart_this_moment">Chart this moment</string>
+    <!-- Button: go back to following the clock -->
+    <string name="when_back_to_now">Back to now</string>
+    <string name="when_cancel">Cancel</string>
+
+    <!-- ============================================================ -->
+    <!-- Object dialog: what was tapped on the chart -->
+
+    <!-- Title when the tapped thing has no name -->
+    <string name="object_title_fallback">Object</string>
+    <!-- One line of facts. %1$s is the label below, %2$s its value -->
+    <string name="object_line">%1$s: %2$s</string>
+    <!-- A star's Bayer or Flamsteed designation, e.g. Alpha Lyrae -->
+    <string name="object_designation">Designation</string>
+    <!-- The star's number in a catalogue (noun) -->
+    <string name="object_catalogue">Catalogue</string>
+    <!-- Astronomical brightness -->
+    <string name="object_magnitude">Magnitude</string>
+    <!-- What sort of body it is (noun) -->
+    <string name="object_kind">Kind</string>
+    <string name="object_kind_sun">The Sun</string>
+    <string name="object_kind_moon">The Moon</string>
+    <string name="object_kind_planet">Planet</string>
+    <!-- The Moon's phase (noun) -->
+    <string name="object_phase">Phase</string>
+    <!-- %1$s is the phase name, e.g. "waxing gibbous" (not translated yet), %2$d the percent lit -->
+    <string name="object_phase_value">%1$s, %2$d%% lit</string>
+    <!-- Height above the horizon in degrees (astronomy, not height above the sea) -->
+    <string name="object_altitude">Altitude</string>
+    <string name="object_altitude_value">%1$.1f° above the horizon</string>
+    <!-- Compass bearing in degrees -->
+    <string name="object_azimuth">Azimuth</string>
+    <string name="object_azimuth_value">%1$.1f° from north</string>
+    <!-- Button (verb) -->
+    <string name="object_close">Close</string>
+
+    <!-- ============================================================ -->
+    <!-- Settings screen: what is drawn on the chart -->
+
+    <string name="settings_title">Settings</string>
+    <!-- Top bar buttons, read aloud by a screen reader -->
+    <string name="settings_cd_close">Close</string>
+    <string name="settings_cd_about">About</string>
+
+    <!-- The magnitude limit row. %1$.0f is the magnitude, 3 to 6 -->
+    <string name="settings_faintest_star">Faintest star</string>
+    <string name="settings_magnitude_value">magnitude %1$.0f</string>
+    <string name="settings_magnitude_note_bright">The bright ones only.</string>
+    <string name="settings_magnitude_note_town">About what a town sky gives you.</string>
+    <string name="settings_magnitude_note_dark">About what a dark night gives the naked eye.</string>
+
+    <!-- How heavy the chart's lines and dots are drawn -->
+    <string name="settings_mark_weight">Mark weight</string>
+    <string name="settings_mark_weight_note_fine">A hairline chart. Most sky, least ink.</string>
+    <string name="settings_mark_weight_note_medium">What a paper atlas prints at.</string>
+    <string name="settings_mark_weight_note_bold">For gloves, torchlight and tired eyes.</string>
+
+    <!-- Layer toggles -->
+    <!-- The stick figures joining a constellation's stars -->
+    <string name="settings_constellation_figures">Constellation figures</string>
+    <string name="settings_constellation_names">Constellation names</string>
+    <!-- Row under constellation names: which kind of name to show (Latin, English or abbreviation) -->
+    <string name="settings_call_them">Call them</string>
+    <!-- One example of each kind: Latin name, English name, IAU abbreviation. Keep "Andromeda" and "And." -->
+    <string name="settings_call_them_note">Andromeda, Chained Maiden, And.</string>
+    <string name="settings_constellation_boundaries">Constellation boundaries</string>
+    <string name="settings_star_names">Star names</string>
+    <string name="settings_solar_system">Sun, Moon and planets</string>
+    <!-- Row under "Sun, Moon and planets": label them on the chart -->
+    <string name="settings_solar_names">Name them</string>
+    <string name="settings_ecliptic">Ecliptic</string>
+    <string name="settings_equator">Celestial equator</string>
+    <string name="settings_grid">Declination grid</string>
+    <string name="settings_altitude_circles">Altitude circles</string>
+    <!-- A toggle row's value: the layer is shown / hidden -->
+    <string name="settings_on">On</string>
+    <string name="settings_off">Off</string>
+
+    <!-- ============================================================ -->
+    <!-- About dialog. Keep the names of the app, people, projects, catalogues and licences as they are -->
+
+    <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
+    <string name="about_title">Star Chart %1$s</string>
+    <string name="about_black_on_white">Black on white, like a paper chart. A screen full of black would be unreadable outdoors and slow to redraw here.</string>
+    <string name="about_privacy">Stars from the Yale Bright Star Catalogue. Positions are computed on the phone; nothing is fetched and nothing is sent.</string>
+    <string name="about_after">After AndroidPlanisphere by Timo Engel, whose astronomy this runs on unchanged.</string>
+    <!-- The name of the app's licence -->
+    <string name="about_licence">GNU General Public License v3 or later</string>
+    <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
+    <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
+    <string name="about_feed_the_llamas">Feed the llamas</string>
+    <!-- Toast when the donation link cannot be opened -->
+    <string name="about_no_browser">There is no browser on this phone to open that with.</string>
+    <!-- Button that closes the About dialog -->
+    <string name="about_close">Close</string>
 </resources>

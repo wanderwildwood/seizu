@@ -16,11 +16,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
+import com.wanderwildwood.seizu.R
 import com.wanderwildwood.seizu.sky.Layers
 import com.wanderwildwood.seizu.sky.MarkWeight
 
@@ -45,9 +47,9 @@ fun SettingsScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBarMMD(
-                title = { TextMMD(text = "Settings") },
-                navigationIcon = { BarButton(Icons.Close, "Close", onClose) },
-                actions = { BarButton(Icons.Info, "About", { aboutOpen = true }) },
+                title = { TextMMD(text = stringResource(R.string.settings_title)) },
+                navigationIcon = { BarButton(Icons.Close, stringResource(R.string.settings_cd_close), onClose) },
+                actions = { BarButton(Icons.Info, stringResource(R.string.settings_cd_about), { aboutOpen = true }) },
             )
         },
     ) { contentPadding ->
@@ -65,12 +67,12 @@ fun SettingsScreen(
             }
             item {
                 Row(
-                    title = "Faintest star",
-                    value = "magnitude %.0f".format(layers.magnitudeLimit),
+                    title = stringResource(R.string.settings_faintest_star),
+                    value = stringResource(R.string.settings_magnitude_value, layers.magnitudeLimit),
                     note = when {
-                        layers.magnitudeLimit <= 3 -> "The bright ones only."
-                        layers.magnitudeLimit <= 5 -> "About what a town sky gives you."
-                        else -> "About what a dark night gives the naked eye."
+                        layers.magnitudeLimit <= 3 -> stringResource(R.string.settings_magnitude_note_bright)
+                        layers.magnitudeLimit <= 5 -> stringResource(R.string.settings_magnitude_note_town)
+                        else -> stringResource(R.string.settings_magnitude_note_dark)
                     },
                 ) {
                     // 3, 4, 5, 6 and round again. Below 3 the sky is nearly empty and above 6
@@ -81,12 +83,12 @@ fun SettingsScreen(
             }
             item {
                 Row(
-                    title = "Mark weight",
+                    title = stringResource(R.string.settings_mark_weight),
                     value = layers.markWeight.screenName,
                     note = when (layers.markWeight) {
-                        MarkWeight.FINE -> "A hairline chart. Most sky, least ink."
-                        MarkWeight.MEDIUM -> "What a paper atlas prints at."
-                        MarkWeight.BOLD -> "For gloves, torchlight and tired eyes."
+                        MarkWeight.FINE -> stringResource(R.string.settings_mark_weight_note_fine)
+                        MarkWeight.MEDIUM -> stringResource(R.string.settings_mark_weight_note_medium)
+                        MarkWeight.BOLD -> stringResource(R.string.settings_mark_weight_note_bold)
                     },
                 ) {
                     onLayers(layers.copy(markWeight = layers.markWeight.next()))
@@ -96,43 +98,43 @@ fun SettingsScreen(
                 HorizontalDividerMMD()
             }
             item {
-                Toggle("Constellation figures", layers.constellationLines) {
+                Toggle(stringResource(R.string.settings_constellation_figures), layers.constellationLines) {
                     onLayers(layers.copy(constellationLines = it))
                 }
             }
             item {
-                Toggle("Constellation names", layers.constellationNames) {
+                Toggle(stringResource(R.string.settings_constellation_names), layers.constellationNames) {
                     onLayers(layers.copy(constellationNames = it))
                 }
             }
             if (layers.constellationNames) {
                 item {
                     Row(
-                        title = "Call them",
+                        title = stringResource(R.string.settings_call_them),
                         value = layers.naming.screenName,
-                        note = "Andromeda, Chained Maiden, And.",
+                        note = stringResource(R.string.settings_call_them_note),
                     ) {
                         onLayers(layers.copy(naming = layers.naming.next()))
                     }
                 }
             }
             item {
-                Toggle("Constellation boundaries", layers.constellationBoundaries) {
+                Toggle(stringResource(R.string.settings_constellation_boundaries), layers.constellationBoundaries) {
                     onLayers(layers.copy(constellationBoundaries = it))
                 }
             }
             item {
-                Toggle("Star names", layers.starNames) {
+                Toggle(stringResource(R.string.settings_star_names), layers.starNames) {
                     onLayers(layers.copy(starNames = it))
                 }
             }
             item {
-                Toggle("Sun, Moon and planets", layers.solarSystem) {
+                Toggle(stringResource(R.string.settings_solar_system), layers.solarSystem) {
                     onLayers(layers.copy(solarSystem = it))
                 }
             }
             item {
-                Toggle("Name them", layers.solarNames) {
+                Toggle(stringResource(R.string.settings_solar_names), layers.solarNames) {
                     onLayers(layers.copy(solarNames = it))
                 }
             }
@@ -140,16 +142,16 @@ fun SettingsScreen(
                 HorizontalDividerMMD()
             }
             item {
-                Toggle("Ecliptic", layers.ecliptic) { onLayers(layers.copy(ecliptic = it)) }
+                Toggle(stringResource(R.string.settings_ecliptic), layers.ecliptic) { onLayers(layers.copy(ecliptic = it)) }
             }
             item {
-                Toggle("Celestial equator", layers.equator) { onLayers(layers.copy(equator = it)) }
+                Toggle(stringResource(R.string.settings_equator), layers.equator) { onLayers(layers.copy(equator = it)) }
             }
             item {
-                Toggle("Declination grid", layers.grid) { onLayers(layers.copy(grid = it)) }
+                Toggle(stringResource(R.string.settings_grid), layers.grid) { onLayers(layers.copy(grid = it)) }
             }
             item {
-                Toggle("Altitude circles", layers.altitudeGrid) {
+                Toggle(stringResource(R.string.settings_altitude_circles), layers.altitudeGrid) {
                     onLayers(layers.copy(altitudeGrid = it))
                 }
             }
@@ -164,7 +166,7 @@ fun SettingsScreen(
 
 @Composable
 private fun Toggle(title: String, on: Boolean, onChange: (Boolean) -> Unit) {
-    Row(title = title, value = if (on) "On" else "Off") { onChange(!on) }
+    Row(title = title, value = if (on) stringResource(R.string.settings_on) else stringResource(R.string.settings_off)) { onChange(!on) }
 }
 
 @Composable

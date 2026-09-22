@@ -16,10 +16,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
+import com.wanderwildwood.seizu.R
 import com.wanderwildwood.seizu.sky.ChartState
 import com.wanderwildwood.seizu.sky.FACINGS
 import com.wanderwildwood.seizu.sky.MIN_ZOOM
@@ -50,8 +52,8 @@ fun ChartScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBarMMD(
-                title = { TextMMD(text = "Star Chart") },
-                actions = { BarButton(Icons.Settings, "Settings", onSettings) },
+                title = { TextMMD(text = stringResource(R.string.chart_title)) },
+                actions = { BarButton(Icons.Settings, stringResource(R.string.chart_cd_settings), onSettings) },
             )
         },
     ) { contentPadding ->
@@ -65,10 +67,10 @@ fun ChartScreen(
                         modifier = Modifier.fillMaxSize().padding(top = 60.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        TextMMD(text = "Reading the catalogue…", style = MaterialTheme.typography.titleSmall)
+                        TextMMD(text = stringResource(R.string.chart_loading), style = MaterialTheme.typography.titleSmall)
                         Spacer(Modifier.height(8.dp))
                         TextMMD(
-                            text = "Nine thousand stars. This happens once.",
+                            text = stringResource(R.string.chart_loading_note),
                             style = MaterialTheme.typography.labelSmall,
                         )
                     }
@@ -89,16 +91,17 @@ fun ChartScreen(
             }
 
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                val nowLabel = stringResource(R.string.chart_when_now_label)
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Field(
-                        label = state.scene.whenText.ifEmpty { "Now" },
-                        sub = if (state.fixedTime == null) "now" else "set",
+                        label = state.scene.whenText.ifEmpty { nowLabel },
+                        sub = if (state.fixedTime == null) stringResource(R.string.chart_when_sub_now) else stringResource(R.string.chart_when_sub_set),
                         onClick = onWhen,
                         modifier = Modifier.weight(1f),
                     )
                     Field(
                         label = state.scene.whereText.ifEmpty { "—" },
-                        sub = if (state.usingGps) "GPS" else "by hand",
+                        sub = if (state.usingGps) stringResource(R.string.chart_where_sub_gps) else stringResource(R.string.chart_where_sub_by_hand),
                         onClick = onWhere,
                         modifier = Modifier.weight(1f),
                     )
@@ -164,6 +167,6 @@ private fun Field(label: String, sub: String, onClick: () -> Unit, modifier: Mod
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
     ) {
-        TextMMD(text = "$label \u00b7 $sub", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.chart_field, label, sub), style = MaterialTheme.typography.labelSmall)
     }
 }
