@@ -40,6 +40,9 @@ for.
 - **Any moment, anywhere.** Set the time and the place by hand — the useful question is
   usually what will be up at ten tonight from a campsite next week, not what is overhead
   indoors right now.
+- **Step an hour or a day** either way, without typing a date. A day step keeps the hour
+  of the clock, so the same night next week is one button four times, and the chart holds
+  the moment you put it on rather than drifting back to the present.
 - **Tap anything** for its designation, magnitude, altitude and bearing.
 
 ## The projection

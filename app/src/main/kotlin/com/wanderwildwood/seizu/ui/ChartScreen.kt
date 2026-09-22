@@ -45,6 +45,7 @@ fun ChartScreen(
     onZoom: (Float) -> Unit,
     onPan: (Float, Float) -> Unit,
     onResetView: () -> Unit,
+    onStepTime: (hours: Int, days: Int) -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -106,6 +107,23 @@ fun ChartScreen(
 
                 Spacer(Modifier.height(6.dp))
 
+                // A whole hour and a whole day, either way. The question this app is for
+                // is what will be up at ten tonight, or on the same night next week, and
+                // answering it through the When dialog meant typing five fields to change
+                // one of them. Stepping fixes the moment, so the chart stops following
+                // the clock -- the field above says "set" as soon as one of these is used.
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    StepButton("\u2212 day", Modifier.weight(1f)) { onStepTime(0, -1) }
+                    Spacer(Modifier.width(6.dp))
+                    StepButton("\u2212 hr", Modifier.weight(1f)) { onStepTime(-1, 0) }
+                    Spacer(Modifier.width(6.dp))
+                    StepButton("+ hr", Modifier.weight(1f)) { onStepTime(1, 0) }
+                    Spacer(Modifier.width(6.dp))
+                    StepButton("+ day", Modifier.weight(1f)) { onStepTime(0, 1) }
+                }
+
+                Spacer(Modifier.height(6.dp))
+
                 // Which way the chart is turned, with the zoom either side of it: the
                 // three things you change while standing outside holding the phone up,
                 // on one row under your thumb. Pinching works too, but a pinch on a panel
@@ -148,6 +166,14 @@ fun ChartScreen(
             }
         }
     }
+}
+
+@Composable
+private fun StepButton(label: String, modifier: Modifier, onClick: () -> Unit) {
+    OutlinedButtonMMD(
+        onClick = onClick,
+        modifier = modifier.height(40.dp),
+    ) { TextMMD(text = label, style = MaterialTheme.typography.labelSmall) }
 }
 
 @Composable

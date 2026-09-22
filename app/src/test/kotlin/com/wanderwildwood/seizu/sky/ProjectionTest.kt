@@ -3,6 +3,9 @@ package com.wanderwildwood.seizu.sky
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.Calendar
+import java.util.GregorianCalendar
+import java.util.TimeZone
 import kotlin.math.hypot
 
 /**
@@ -343,5 +346,59 @@ class DesignationTest {
     @Test
     fun `an empty designation stays empty`() {
         assertEquals("", designation(""))
+    }
+}
+
+/**
+ * Stepping the charted moment.
+ *
+ * The thing worth pinning is that a day step keeps the hour of the clock. Adding
+ * 24 * 3600 * 1000 milliseconds does not, on the two nights a year the clocks move, and
+ * "the same time tomorrow" is the whole question this control exists to answer.
+ */
+class TimeStepTest {
+
+    @Test
+    fun `an hour forward is an hour later`() {
+        val from = GregorianCalendar(2026, Calendar.SEPTEMBER, 22, 21, 0)
+        val next = steppedTime(from, hours = 1, days = 0)
+        assertEquals(22, next.get(Calendar.HOUR_OF_DAY))
+        assertEquals(22, next.get(Calendar.DAY_OF_MONTH))
+    }
+
+    @Test
+    fun `stepping back over midnight lands on the day before`() {
+        val from = GregorianCalendar(2026, Calendar.SEPTEMBER, 22, 0, 30)
+        val next = steppedTime(from, hours = -1, days = 0)
+        assertEquals(23, next.get(Calendar.HOUR_OF_DAY))
+        assertEquals(21, next.get(Calendar.DAY_OF_MONTH))
+    }
+
+    @Test
+    fun `a day forward over the end of a month rolls the month`() {
+        val from = GregorianCalendar(2026, Calendar.SEPTEMBER, 30, 21, 0)
+        val next = steppedTime(from, hours = 0, days = 1)
+        assertEquals(Calendar.OCTOBER, next.get(Calendar.MONTH))
+        assertEquals(1, next.get(Calendar.DAY_OF_MONTH))
+        assertEquals(21, next.get(Calendar.HOUR_OF_DAY))
+    }
+
+    @Test
+    fun `a day forward over a daylight-saving change keeps the hour`() {
+        val newYork = TimeZone.getTimeZone("America/New_York")
+        // The US clocks go back on 1 November 2026, so this day is 25 hours long.
+        val from = GregorianCalendar(newYork).apply { set(2026, Calendar.OCTOBER, 31, 21, 0, 0) }
+        val next = steppedTime(from, hours = 0, days = 1)
+        assertEquals(21, next.get(Calendar.HOUR_OF_DAY))
+        assertEquals(1, next.get(Calendar.DAY_OF_MONTH))
+        assertEquals(Calendar.NOVEMBER, next.get(Calendar.MONTH))
+    }
+
+    @Test
+    fun `the original is not moved`() {
+        val from = GregorianCalendar(2026, Calendar.SEPTEMBER, 22, 21, 0)
+        steppedTime(from, hours = 5, days = 3)
+        assertEquals(21, from.get(Calendar.HOUR_OF_DAY))
+        assertEquals(22, from.get(Calendar.DAY_OF_MONTH))
     }
 }

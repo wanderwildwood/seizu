@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.GregorianCalendar
 
 data class ChartState(
@@ -87,6 +88,17 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         rebuild()
     }
 
+    /**
+     * Move the charted moment by a whole hour or a whole day.
+     *
+     * Stepping always lands on a fixed time, even when the chart was following the clock:
+     * "an hour from now" is a moment, and one that quietly drifted back to the present
+     * while you were still reading it would be worse than one that stayed where it was put.
+     */
+    fun stepTime(hours: Int = 0, days: Int = 0) {
+        setTime(steppedTime(_state.value.fixedTime ?: GregorianCalendar(), hours, days))
+    }
+
     fun setLayers(layers: Layers) {
         preferences.layers = layers
         _state.update { it.copy(layers = layers) }
@@ -130,4 +142,18 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     fun resetView() = _state.update { it.copy(zoom = MIN_ZOOM, panX = 0f, panY = 0f) }
 
     fun select(objectAt: SkyObject?) = _state.update { it.copy(selected = objectAt) }
+}
+
+/**
+ * [from], moved by whole hours and whole days.
+ *
+ * Calendar rather than arithmetic on milliseconds, so a step of a day over the end of a
+ * month or over a daylight-saving change lands on the same hour of the clock the next
+ * day. On the nights that matters, an hour is exactly what you are asking about.
+ */
+fun steppedTime(from: GregorianCalendar, hours: Int, days: Int): GregorianCalendar {
+    val next = from.clone() as GregorianCalendar
+    next.add(Calendar.DAY_OF_MONTH, days)
+    next.add(Calendar.HOUR_OF_DAY, hours)
+    return next
 }
