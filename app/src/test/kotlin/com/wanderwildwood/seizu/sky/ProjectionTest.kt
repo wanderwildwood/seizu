@@ -1,5 +1,6 @@
 package com.wanderwildwood.seizu.sky
 
+import com.wanderwildwood.seizu.ui.cardinalName
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -312,6 +313,12 @@ class AzimuthTest {
         assertEquals(180.0, CARDINALS.first { it.first == "S" }.second, 1e-9)
         assertEquals(270.0, CARDINALS.first { it.first == "W" }.second, 1e-9)
     }
+
+    @Test
+    fun `every cardinal key has a word to draw`() {
+        val words = CARDINALS.map { cardinalName(it.first) }
+        assertEquals("four different words", 4, words.toSet().size)
+    }
 }
 
 /**
@@ -449,14 +456,14 @@ class MoonPhaseTest {
     @Test
     fun `each phase gets the name an almanac would print`() {
         fun name(sun: Double, moon: Double) = phaseName(moonPhase(sun, moon, 0.0))
-        assertEquals("new", name(0.0, 0.0))
-        assertEquals("waxing crescent", name(0.0, 45.0))
-        assertEquals("first quarter", name(0.0, 90.0))
-        assertEquals("waxing gibbous", name(0.0, 135.0))
-        assertEquals("full", name(0.0, 180.0))
-        assertEquals("waning gibbous", name(0.0, 225.0))
-        assertEquals("last quarter", name(0.0, 270.0))
-        assertEquals("waning crescent", name(0.0, 315.0))
+        assertEquals(PhaseName.NEW, name(0.0, 0.0))
+        assertEquals(PhaseName.WAXING_CRESCENT, name(0.0, 45.0))
+        assertEquals(PhaseName.FIRST_QUARTER, name(0.0, 90.0))
+        assertEquals(PhaseName.WAXING_GIBBOUS, name(0.0, 135.0))
+        assertEquals(PhaseName.FULL, name(0.0, 180.0))
+        assertEquals(PhaseName.WANING_GIBBOUS, name(0.0, 225.0))
+        assertEquals(PhaseName.LAST_QUARTER, name(0.0, 270.0))
+        assertEquals(PhaseName.WANING_CRESCENT, name(0.0, 315.0))
     }
 
     @Test
@@ -464,10 +471,10 @@ class MoonPhaseTest {
         // The canvas draws an empty ring below one threshold and a solid disc above the
         // other. If the words used different numbers, a solid disc could be called
         // gibbous, which is the one way this can be wrong without looking wrong.
-        assertEquals("new", phaseName(MoonPhase(MOON_NEW_BELOW - 0.001, waxing = true)))
-        assertEquals("full", phaseName(MoonPhase(MOON_FULL_ABOVE + 0.001, waxing = true)))
-        assertTrue(phaseName(MoonPhase(MOON_NEW_BELOW + 0.001, waxing = true)) != "new")
-        assertTrue(phaseName(MoonPhase(MOON_FULL_ABOVE - 0.001, waxing = true)) != "full")
+        assertEquals(PhaseName.NEW, phaseName(MoonPhase(MOON_NEW_BELOW - 0.001, waxing = true)))
+        assertEquals(PhaseName.FULL, phaseName(MoonPhase(MOON_FULL_ABOVE + 0.001, waxing = true)))
+        assertTrue(phaseName(MoonPhase(MOON_NEW_BELOW + 0.001, waxing = true)) != PhaseName.NEW)
+        assertTrue(phaseName(MoonPhase(MOON_FULL_ABOVE - 0.001, waxing = true)) != PhaseName.FULL)
     }
 
     @Test
@@ -476,5 +483,24 @@ class MoonPhaseTest {
         val phase = moonPhase(sunLongitude = 0.0, moonLongitude = 180.0, moonLatitude = 5.0)
         assertTrue(phase.illuminated < 1.0)
         assertTrue(phase.illuminated > 0.99)
+    }
+}
+
+class PlaceTest {
+
+    @Test
+    fun `the hemispheres follow the signs`() {
+        val greenwich = Place(51.4778, -0.0014)
+        assertTrue(greenwich.north)
+        assertTrue(!greenwich.east)
+        val sydney = Place(-33.87, 151.21)
+        assertTrue(!sydney.north)
+        assertTrue(sydney.east)
+    }
+
+    @Test
+    fun `the equator and the prime meridian read north and east`() {
+        assertTrue(Place(0.0, 0.0).north)
+        assertTrue(Place(0.0, 0.0).east)
     }
 }

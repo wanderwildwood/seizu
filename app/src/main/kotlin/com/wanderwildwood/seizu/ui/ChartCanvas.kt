@@ -1,5 +1,6 @@
 package com.wanderwildwood.seizu.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -26,6 +28,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.wanderwildwood.seizu.R
 import com.wanderwildwood.seizu.sky.ALTITUDE_CIRCLES
 import com.wanderwildwood.seizu.sky.AZIMUTH_SPOKES
 import com.wanderwildwood.seizu.sky.BodyKind
@@ -38,6 +41,7 @@ import com.wanderwildwood.seizu.sky.MarkWeight
 import com.wanderwildwood.seizu.sky.MoonPhase
 import com.wanderwildwood.seizu.sky.Projection
 import com.wanderwildwood.seizu.sky.Scene
+import com.wanderwildwood.seizu.sky.SkyBody
 import com.wanderwildwood.seizu.sky.SkyObject
 import com.wanderwildwood.seizu.sky.bodyRadius
 import com.wanderwildwood.seizu.sky.starRadius
@@ -84,6 +88,9 @@ fun ChartCanvas(
     // pair of lambdas happened to exist when the first finger went down.
     val zoomBy by rememberUpdatedState(onZoom)
     val panBy by rememberUpdatedState(onPan)
+    // Words are looked up here, where there are resources, and handed to the drawing.
+    val cardinalNames = CARDINALS.map { (key, _) -> stringResource(cardinalName(key)) }
+    val bodyNames = scene.bodies.map { bodyName(it) }
 
     Canvas(
         modifier = modifier
@@ -139,7 +146,7 @@ fun ChartCanvas(
             drawSkyLine(line.points, line.kind, projection, weight)
         }
 
-        drawHorizon(projection, weight, labels)
+        drawHorizon(projection, weight, cardinalNames, labels)
 
         // The stars go down before the rings, so that where a planet sits on a faint star
         // the ring is the mark on top — the same order the tap goes through them in.
@@ -158,7 +165,7 @@ fun ChartCanvas(
             }
         }
 
-        scene.bodies.forEach { body ->
+        scene.bodies.forEachIndexed { index, body ->
             val (x, y) = projection.project(body.azimuth, body.elevation)
             val radius = bodyRadius(body.kind, body.magnitude, base)
             // A ring, not a disc, so a planet is never mistaken for a bright star and so
@@ -176,7 +183,7 @@ fun ChartCanvas(
                 drawCircle(Color.Black, radius = base * 0.7f, center = Offset(x, y))
             }
             if (layers.solarNames) {
-                labels += Label(body.label, x + radius + LABEL_GAP.toPx(), y, BODY_TEXT)
+                labels += Label(bodyNames[index], x + radius + LABEL_GAP.toPx(), y, BODY_TEXT)
             }
         }
 
@@ -265,10 +272,11 @@ private fun DrawScope.strokeFor(kind: LineKind, weight: MarkWeight): Float {
     return (width.toPx() * weight.scale).coerceAtLeast(1f)
 }
 
-/** The rim, and the four points of the compass around it. */
+/** The rim, and the four points of the compass around it, [names] in [CARDINALS] order. */
 private fun DrawScope.drawHorizon(
     projection: Projection,
     weight: MarkWeight,
+    names: List<String>,
     labels: MutableList<Label>,
 ) {
     drawCircle(
@@ -278,11 +286,46 @@ private fun DrawScope.drawHorizon(
         style = Stroke(width = (1.1.dp.toPx() * weight.scale).coerceAtLeast(1f)),
     )
 
-    CARDINALS.forEach { (name, azimuth) ->
+    CARDINALS.forEachIndexed { index, (_, azimuth) ->
         val (x, y) = projection.project(azimuth, CARDINAL_DROP)
         val anchor = keptOnScreen(Offset(x, y))
-        labels += Label(name, anchor.x, anchor.y, CARDINAL_TEXT, centred = true)
+        labels += Label(names[index], anchor.x, anchor.y, CARDINAL_TEXT, centred = true)
     }
+}
+
+/** The word for one of the [CARDINALS] keys. */
+@StringRes
+internal fun cardinalName(key: String): Int = when (key) {
+    "N" -> R.string.compass_north
+    "E" -> R.string.compass_east
+    "S" -> R.string.compass_south
+    "W" -> R.string.compass_west
+    else -> error("not a cardinal: $key")
+}
+
+/**
+ * What the Sun, the Moon or a planet is called, on the chart and over its details.
+ *
+ * A planet arrives with upstream's English name, which is looked up here; one this does
+ * not know is shown as it came.
+ */
+@Composable
+internal fun bodyName(body: SkyBody): String = when (body.kind) {
+    BodyKind.SUN -> stringResource(R.string.body_sun)
+    BodyKind.MOON -> stringResource(R.string.body_moon)
+    BodyKind.PLANET -> planetName(body.label)?.let { stringResource(it) } ?: body.label.orEmpty()
+}
+
+@StringRes
+private fun planetName(upstreamName: String?): Int? = when (upstreamName) {
+    "Mercury" -> R.string.planet_mercury
+    "Venus" -> R.string.planet_venus
+    "Mars" -> R.string.planet_mars
+    "Jupiter" -> R.string.planet_jupiter
+    "Saturn" -> R.string.planet_saturn
+    "Uranus" -> R.string.planet_uranus
+    "Neptune" -> R.string.planet_neptune
+    else -> null
 }
 
 /**

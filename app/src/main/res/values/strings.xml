@@ -25,6 +25,39 @@
     <string name="chart_where_sub_gps">GPS</string>
     <!-- Qualifier: the place was typed in -->
     <string name="chart_where_sub_by_hand">by hand</string>
+    <!-- The when field's value: the date and time the chart is drawn for. A java.text.SimpleDateFormat pattern, not text: d day, MMM short month name, yyyy year, HH:mm 24-hour time. Reorder the fields for your language; the month name is put in by the phone -->
+    <string name="chart_when_pattern">d MMM yyyy, HH:mm</string>
+    <!-- The where field's value. %1$.2f is the latitude and %3$.2f the longitude, both without a sign; %2$s and %4$s are the compass letters below that say which side of the equator and of Greenwich -->
+    <string name="chart_where_value">%1$.2f°%2$s %3$.2f°%4$s</string>
+
+    <!-- Single-letter compass points: around the rim of the chart, and after a latitude (N/S) or longitude (E/W) -->
+    <!-- North -->
+    <string name="compass_north">N</string>
+    <!-- East -->
+    <string name="compass_east">E</string>
+    <!-- South -->
+    <string name="compass_south">S</string>
+    <!-- West -->
+    <string name="compass_west">W</string>
+
+    <!-- The button under the chart that turns it: which compass point is at the top -->
+    <string name="chart_facing_north">North up</string>
+    <string name="chart_facing_east">East up</string>
+    <string name="chart_facing_south">South up</string>
+    <string name="chart_facing_west">West up</string>
+    <!-- The same button when zoomed in. %1$s is one of the four above, %2$.1f the zoom (×2.5 means two and a half times). Keep the two spaces, and the quotes that keep them -->
+    <string name="chart_facing_zoomed">"%1$s  ×%2$.1f"</string>
+
+    <!-- Names beside the Sun, the Moon and the planets on the chart, and over their details when tapped -->
+    <string name="body_sun">Sun</string>
+    <string name="body_moon">Moon</string>
+    <string name="planet_mercury">Mercury</string>
+    <string name="planet_venus">Venus</string>
+    <string name="planet_mars">Mars</string>
+    <string name="planet_jupiter">Jupiter</string>
+    <string name="planet_saturn">Saturn</string>
+    <string name="planet_uranus">Uranus</string>
+    <string name="planet_neptune">Neptune</string>
 
     <!-- ============================================================ -->
     <!-- Where dialog: the place the sky is charted from -->
@@ -79,8 +112,17 @@
     <string name="object_kind_planet">Planet</string>
     <!-- The Moon's phase (noun) -->
     <string name="object_phase">Phase</string>
-    <!-- %1$s is the phase name, e.g. "waxing gibbous" (not translated yet), %2$d the percent lit -->
+    <!-- %1$s is one of the phase names below, %2$d the percent lit -->
     <string name="object_phase_value">%1$s, %2$d%% lit</string>
+    <!-- The Moon's phases, as an almanac names them. Lower case: they begin the line above -->
+    <string name="phase_new">new</string>
+    <string name="phase_waxing_crescent">waxing crescent</string>
+    <string name="phase_first_quarter">first quarter</string>
+    <string name="phase_waxing_gibbous">waxing gibbous</string>
+    <string name="phase_full">full</string>
+    <string name="phase_waning_gibbous">waning gibbous</string>
+    <string name="phase_last_quarter">last quarter</string>
+    <string name="phase_waning_crescent">waning crescent</string>
     <!-- Height above the horizon in degrees (astronomy, not height above the sea) -->
     <string name="object_altitude">Altitude</string>
     <string name="object_altitude_value">%1$.1f° above the horizon</string>
@@ -107,6 +149,10 @@
 
     <!-- How heavy the chart's lines and dots are drawn -->
     <string name="settings_mark_weight">Mark weight</string>
+    <!-- Its three values: the thickness of the lines and dots, thinnest first (not a font weight) -->
+    <string name="settings_mark_weight_fine">Fine</string>
+    <string name="settings_mark_weight_medium">Medium</string>
+    <string name="settings_mark_weight_bold">Bold</string>
     <string name="settings_mark_weight_note_fine">A hairline chart. Most sky, least ink.</string>
     <string name="settings_mark_weight_note_medium">What a paper atlas prints at.</string>
     <string name="settings_mark_weight_note_bold">For gloves, torchlight and tired eyes.</string>
@@ -119,6 +165,11 @@
     <string name="settings_call_them">Call them</string>
     <!-- One example of each kind: Latin name, English name, IAU abbreviation. Keep "Andromeda" and "And." -->
     <string name="settings_call_them_note">Andromeda, Chained Maiden, And.</string>
+    <!-- Its three values: which kind of name. "English" is the English translation of the Latin, e.g. Great Bear; the names themselves come from the catalogue in English -->
+    <string name="settings_call_them_latin">Latin</string>
+    <string name="settings_call_them_english">English</string>
+    <!-- The three-letter IAU abbreviation, e.g. UMa -->
+    <string name="settings_call_them_abbreviation">Abbreviation</string>
     <string name="settings_constellation_boundaries">Constellation boundaries</string>
     <string name="settings_star_names">Star names</string>
     <string name="settings_solar_system">Sun, Moon and planets</string>

@@ -96,8 +96,8 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Turn the chart so a different bearing is at the bottom. No rebuild: same sky. */
     fun nextFacing() {
-        val index = FACINGS.indexOfFirst { it.second == _state.value.facing }
-        val next = FACINGS[(index + 1).mod(FACINGS.size)].second
+        val index = FACINGS.indexOf(_state.value.facing)
+        val next = FACINGS[(index + 1).mod(FACINGS.size)]
         preferences.facing = next
         _state.update { it.copy(facing = next) }
     }

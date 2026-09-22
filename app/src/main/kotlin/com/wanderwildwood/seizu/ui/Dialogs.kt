@@ -235,7 +235,7 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
     EInkDialog(onDismiss = onDismiss) {
         val title = when (objectAt) {
             is SkyStar -> objectAt.label ?: "HR ${objectAt.hr}"
-            is SkyBody -> objectAt.label
+            is SkyBody -> bodyName(objectAt)
             else -> stringResource(R.string.object_title_fallback)
         }
         TextMMD(text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
@@ -264,7 +264,7 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
                 objectAt.phase?.let { phase ->
                     Line(
                         stringResource(R.string.object_phase),
-                        stringResource(R.string.object_phase_value, phaseName(phase), (phase.illuminated * 100).roundToInt()),
+                        stringResource(R.string.object_phase_value, stringResource(phaseName(phase).labelRes), (phase.illuminated * 100).roundToInt()),
                     )
                 }
             }

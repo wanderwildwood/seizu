@@ -4,11 +4,8 @@ import org.tengel.planisphere.Astro
 import org.tengel.planisphere.Catalog
 import org.tengel.planisphere.ConstellationDb
 import org.tengel.planisphere.Planet
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
-import java.util.Locale
-import kotlin.math.abs
 import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -103,8 +100,8 @@ class SkyBuilder(
             bodies = bodies,
             lines = lines,
             names = names,
-            whenText = WHEN_FORMAT.format(time.time),
-            whereText = placeText(latitude, longitude),
+            moment = time.time,
+            place = Place(latitude, longitude),
         )
     }
 
@@ -249,7 +246,7 @@ class SkyBuilder(
         // (right ascension, declination) in degrees, already equatorial.
         val sun = Astro.calcPositionSun(julianDay)
         toHorizontal(sun[0] / 15.0, sun[1]).let {
-            add(SkyBody(it[0], it[1], -26.7, "Sun", BodyKind.SUN))
+            add(SkyBody(it[0], it[1], -26.7, null, BodyKind.SUN))
         }
 
         // The Moon comes back ECLIPTIC — (beta, lambda, distance) — unlike the Sun, so it
@@ -265,7 +262,7 @@ class SkyBuilder(
             moonLatitude = moon[0],
         )
         toHorizontal(moonEquatorial[0] / 15.0, moonEquatorial[1]).let {
-            add(SkyBody(it[0], it[1], -12.7, "Moon", BodyKind.MOON, phase))
+            add(SkyBody(it[0], it[1], -12.7, null, BodyKind.MOON, phase))
         }
 
         val earth = Planet.sEarth ?: return@buildList
@@ -292,14 +289,6 @@ class SkyBuilder(
     private companion object {
         /** Degrees above the horizon the middle of a constellation must be, to be named. */
         const val NAME_FLOOR = 4.0
-
-        val WHEN_FORMAT = SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault())
-
-        fun placeText(latitude: Double, longitude: Double): String {
-            val ns = if (latitude >= 0) "N" else "S"
-            val ew = if (longitude >= 0) "E" else "W"
-            return "%.2f°%s %.2f°%s".format(abs(latitude), ns, abs(longitude), ew)
-        }
     }
 }
 

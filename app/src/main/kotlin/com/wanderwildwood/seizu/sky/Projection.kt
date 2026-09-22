@@ -154,7 +154,7 @@ fun bodyRadius(kind: BodyKind, apparentMagnitude: Double, base: Float): Float = 
  * The four cardinal points, and where each sits on the rim.
  *
  * North is 0 and the compass runs clockwise through east, which is the convention every
- * azimuth in this app uses.
+ * azimuth in this app uses. The letter is a key; the chart words it when it draws it.
  */
 val CARDINALS: List<Pair<String, Double>> = listOf(
     "N" to 0.0,
@@ -164,12 +164,7 @@ val CARDINALS: List<Pair<String, Double>> = listOf(
 )
 
 /** Bearings the chart can be turned to, in the order the button cycles them. */
-val FACINGS: List<Pair<String, Int>> = listOf(
-    "North up" to 0,
-    "East up" to 90,
-    "South up" to 180,
-    "West up" to 270,
-)
+val FACINGS: List<Int> = listOf(0, 90, 180, 270)
 
 /**
  * Upstream's azimuthal grid: circles of altitude, and spokes of bearing between them.

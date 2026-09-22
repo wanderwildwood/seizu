@@ -84,7 +84,7 @@ fun SettingsScreen(
             item {
                 Row(
                     title = stringResource(R.string.settings_mark_weight),
-                    value = layers.markWeight.screenName,
+                    value = stringResource(layers.markWeight.labelRes),
                     note = when (layers.markWeight) {
                         MarkWeight.FINE -> stringResource(R.string.settings_mark_weight_note_fine)
                         MarkWeight.MEDIUM -> stringResource(R.string.settings_mark_weight_note_medium)
@@ -111,7 +111,7 @@ fun SettingsScreen(
                 item {
                     Row(
                         title = stringResource(R.string.settings_call_them),
-                        value = layers.naming.screenName,
+                        value = stringResource(layers.naming.labelRes),
                         note = stringResource(R.string.settings_call_them_note),
                     ) {
                         onLayers(layers.copy(naming = layers.naming.next()))

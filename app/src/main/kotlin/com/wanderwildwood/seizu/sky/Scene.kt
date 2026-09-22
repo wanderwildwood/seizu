@@ -1,5 +1,8 @@
 package com.wanderwildwood.seizu.sky
 
+import androidx.annotation.StringRes
+import com.wanderwildwood.seizu.R
+import java.util.Date
 import kotlin.math.cos
 
 /**
@@ -50,12 +53,17 @@ data class SkyStar(
         }
 }
 
-/** Sun, Moon and planets, which get a ring rather than a disc so they read as not-stars. */
+/**
+ * Sun, Moon and planets, which get a ring rather than a disc so they read as not-stars.
+ *
+ * A planet's [label] is upstream's name for it, which the screen uses as a key to word it.
+ * The Sun and the Moon have none: their [kind] says which they are.
+ */
 data class SkyBody(
     override val azimuth: Double,
     override val elevation: Double,
     val magnitude: Double,
-    override val label: String,
+    override val label: String?,
     val kind: BodyKind,
     /** Only the Moon has one. */
     val phase: MoonPhase? = null,
@@ -83,18 +91,30 @@ data class MoonPhase(
 const val MOON_NEW_BELOW = 0.03
 const val MOON_FULL_ABOVE = 0.97
 
+/** The eight phases an almanac names, in the order the Moon goes through them. */
+enum class PhaseName(@StringRes val labelRes: Int) {
+    NEW(R.string.phase_new),
+    WAXING_CRESCENT(R.string.phase_waxing_crescent),
+    FIRST_QUARTER(R.string.phase_first_quarter),
+    WAXING_GIBBOUS(R.string.phase_waxing_gibbous),
+    FULL(R.string.phase_full),
+    WANING_GIBBOUS(R.string.phase_waning_gibbous),
+    LAST_QUARTER(R.string.phase_last_quarter),
+    WANING_CRESCENT(R.string.phase_waning_crescent),
+}
+
 /**
  * What an almanac would call this phase.
  *
  * The quarters are instants rather than ranges, so they get the half-day either side that
  * a chart can actually distinguish; everything else falls where it falls.
  */
-fun phaseName(phase: MoonPhase): String = when {
-    phase.illuminated < MOON_NEW_BELOW -> "new"
-    phase.illuminated > MOON_FULL_ABOVE -> "full"
-    phase.illuminated < 0.48 -> if (phase.waxing) "waxing crescent" else "waning crescent"
-    phase.illuminated <= 0.52 -> if (phase.waxing) "first quarter" else "last quarter"
-    else -> if (phase.waxing) "waxing gibbous" else "waning gibbous"
+fun phaseName(phase: MoonPhase): PhaseName = when {
+    phase.illuminated < MOON_NEW_BELOW -> PhaseName.NEW
+    phase.illuminated > MOON_FULL_ABOVE -> PhaseName.FULL
+    phase.illuminated < 0.48 -> if (phase.waxing) PhaseName.WAXING_CRESCENT else PhaseName.WANING_CRESCENT
+    phase.illuminated <= 0.52 -> if (phase.waxing) PhaseName.FIRST_QUARTER else PhaseName.LAST_QUARTER
+    else -> if (phase.waxing) PhaseName.WAXING_GIBBOUS else PhaseName.WANING_GIBBOUS
 }
 
 /**
@@ -143,6 +163,12 @@ data class SkyLabel(
     override val label: String,
 ) : SkyObject
 
+/** Where on the Earth a chart is drawn from, in degrees, north and east positive. */
+data class Place(val latitude: Double, val longitude: Double) {
+    val north: Boolean get() = latitude >= 0
+    val east: Boolean get() = longitude >= 0
+}
+
 /**
  * Everything to be drawn for one moment at one place.
  *
@@ -155,8 +181,9 @@ data class Scene(
     val bodies: List<SkyBody> = emptyList(),
     val lines: List<SkyLine> = emptyList(),
     val names: List<SkyLabel> = emptyList(),
-    val whenText: String = "",
-    val whereText: String = "",
+    /** The moment and the place it was built for; null until the first build. */
+    val moment: Date? = null,
+    val place: Place? = null,
 ) {
     val isEmpty: Boolean get() = stars.isEmpty() && bodies.isEmpty()
 }
@@ -170,10 +197,10 @@ data class Scene(
  * the rest. Fine is a hairline chart for reading indoors with the panel clean; bold is
  * for a cold night in gloves.
  */
-enum class MarkWeight(val screenName: String, val scale: Float) {
-    FINE("Fine", 0.78f),
-    MEDIUM("Medium", 1f),
-    BOLD("Bold", 1.3f),
+enum class MarkWeight(@StringRes val labelRes: Int, val scale: Float) {
+    FINE(R.string.settings_mark_weight_fine, 0.78f),
+    MEDIUM(R.string.settings_mark_weight_medium, 1f),
+    BOLD(R.string.settings_mark_weight_bold, 1.3f),
     ;
 
     fun next(): MarkWeight = entries[(ordinal + 1) % entries.size]
@@ -191,10 +218,10 @@ enum class MarkWeight(val screenName: String, val scale: Float) {
  * The numbers are columns in the catalogue's own name table, and its order is not this
  * one: 0 is the abbreviation, 1 Latin, 2 English.
  */
-enum class ConstellationNaming(val screenName: String, val column: Int) {
-    LATIN("Latin", 1),
-    ENGLISH("English", 2),
-    ABBREVIATION("Abbreviation", 0),
+enum class ConstellationNaming(@StringRes val labelRes: Int, val column: Int) {
+    LATIN(R.string.settings_call_them_latin, 1),
+    ENGLISH(R.string.settings_call_them_english, 2),
+    ABBREVIATION(R.string.settings_call_them_abbreviation, 0),
     ;
 
     fun next(): ConstellationNaming = entries[(ordinal + 1) % entries.size]
