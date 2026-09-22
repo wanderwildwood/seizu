@@ -64,14 +64,29 @@ private fun StarChart(viewModel: ChartViewModel = viewModel()) {
     var settingsOpen by remember { mutableStateOf(false) }
     var whenOpen by remember { mutableStateOf(false) }
     var whereOpen by remember { mutableStateOf(false) }
+    // Set when the GPS was asked and had nothing cached. Cleared whenever the dialog is
+    // opened again, so a message from last time is never the first thing read.
+    var noFix by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.load() }
 
     val ask = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        if (granted) lastKnownLocation(context)?.let { viewModel.setLocation(it.first, it.second, true) }
-        whereOpen = false
+        if (!granted) {
+            whereOpen = false
+            return@rememberLauncherForActivityResult
+        }
+        // Permission is not a fix. Granting it and still having nothing cached is the
+        // ordinary case on a phone that has been indoors, so say so and leave the dialog
+        // up rather than closing it on a chart that did not move.
+        val fix = lastKnownLocation(context)
+        if (fix == null) {
+            noFix = true
+        } else {
+            viewModel.setLocation(fix.first, fix.second, true)
+            whereOpen = false
+        }
     }
 
     when {
@@ -86,13 +101,14 @@ private fun StarChart(viewModel: ChartViewModel = viewModel()) {
             onSettings = { settingsOpen = true },
             onFacing = viewModel::nextFacing,
             onWhen = { whenOpen = true },
-            onWhere = { whereOpen = true },
+            onWhere = { noFix = false; whereOpen = true },
             onSelect = viewModel::select,
             onZoomIn = { viewModel.zoomBy(ZOOM_STEP) },
             onZoomOut = { viewModel.zoomBy(1f / ZOOM_STEP) },
             onZoom = viewModel::zoomBy,
             onPan = viewModel::panBy,
             onResetView = viewModel::resetView,
+            onStepTime = { hours, days -> viewModel.stepTime(hours, days) },
         )
     }
 
@@ -109,13 +125,19 @@ private fun StarChart(viewModel: ChartViewModel = viewModel()) {
             latitude = state.latitude,
             longitude = state.longitude,
             canUseGps = true,
+            noFix = noFix,
             onSet = { la, lo -> viewModel.setLocation(la, lo); whereOpen = false },
             onUseGps = {
-                if (hasLocation(context)) {
-                    lastKnownLocation(context)?.let { viewModel.setLocation(it.first, it.second, true) }
-                    whereOpen = false
-                } else {
+                if (!hasLocation(context)) {
                     ask.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                } else {
+                    val fix = lastKnownLocation(context)
+                    if (fix == null) {
+                        noFix = true
+                    } else {
+                        viewModel.setLocation(fix.first, fix.second, true)
+                        whereOpen = false
+                    }
                 }
             },
             onDismiss = { whereOpen = false },

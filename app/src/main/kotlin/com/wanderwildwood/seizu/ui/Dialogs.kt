@@ -47,6 +47,8 @@ fun LocationDialog(
     latitude: Double,
     longitude: Double,
     canUseGps: Boolean,
+    /** The GPS was asked and had nothing to give. Said out loud, or the button reads as broken. */
+    noFix: Boolean,
     onSet: (Double, Double) -> Unit,
     onUseGps: () -> Unit,
     onDismiss: () -> Unit,
@@ -93,6 +95,15 @@ fun LocationDialog(
                 onClick = onUseGps,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
             ) { TextMMD(text = "Ask the GPS", style = MaterialTheme.typography.bodySmall) }
+
+            if (noFix) {
+                Spacer(Modifier.height(8.dp))
+                TextMMD(
+                    text = "The phone has no recent fix. Step outside and try again, " +
+                        "or set it by hand \u2014 a chart is not fussy about a mile.",
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            }
         }
 
         Spacer(Modifier.height(8.dp))
