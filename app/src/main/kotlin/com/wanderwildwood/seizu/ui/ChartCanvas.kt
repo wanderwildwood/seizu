@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -34,7 +35,6 @@ import com.wanderwildwood.seizu.sky.MarkWeight
 import com.wanderwildwood.seizu.sky.Projection
 import com.wanderwildwood.seizu.sky.Scene
 import com.wanderwildwood.seizu.sky.SkyObject
-import com.wanderwildwood.seizu.sky.SkyStar
 import com.wanderwildwood.seizu.sky.bodyRadius
 import com.wanderwildwood.seizu.sky.starRadius
 import kotlin.math.abs
@@ -84,6 +84,10 @@ fun ChartCanvas(
     Canvas(
         modifier = modifier
             .fillMaxSize()
+            // A zoomed disc is wider than the box that holds it, and Canvas does not clip
+            // to its bounds on its own -- without this the chart paints straight over the
+            // date, the place and the row of buttons underneath it.
+            .clipToBounds()
             // Pinch to zoom, drag to move. Both are reported as deltas and handed
             // straight out: where the chart is sits in the view model with everything
             // else that survives a rotation, not in a pile of remembered floats here.
@@ -429,6 +433,6 @@ private fun nearest(
     // Bodies first and stars second, so that where a planet sits on top of a faint star
     // the planet wins ties.
     scene.bodies.forEach(::consider)
-    scene.stars.filter { it is SkyStar }.forEach(::consider)
+    scene.stars.forEach(::consider)
     return best
 }
