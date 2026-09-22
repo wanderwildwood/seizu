@@ -88,17 +88,6 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         rebuild()
     }
 
-    /**
-     * Move the charted moment by a whole hour or a whole day.
-     *
-     * Stepping always lands on a fixed time, even when the chart was following the clock:
-     * "an hour from now" is a moment, and one that quietly drifted back to the present
-     * while you were still reading it would be worse than one that stayed where it was put.
-     */
-    fun stepTime(hours: Int = 0, days: Int = 0) {
-        setTime(steppedTime(_state.value.fixedTime ?: GregorianCalendar(), hours, days))
-    }
-
     fun setLayers(layers: Layers) {
         preferences.layers = layers
         _state.update { it.copy(layers = layers) }

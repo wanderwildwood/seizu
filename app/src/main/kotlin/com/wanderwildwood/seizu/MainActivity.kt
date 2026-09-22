@@ -108,7 +108,6 @@ private fun StarChart(viewModel: ChartViewModel = viewModel()) {
             onZoom = viewModel::zoomBy,
             onPan = viewModel::panBy,
             onResetView = viewModel::resetView,
-            onStepTime = { hours, days -> viewModel.stepTime(hours, days) },
         )
     }
 

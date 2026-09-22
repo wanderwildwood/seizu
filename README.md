@@ -40,9 +40,9 @@ for.
 - **Any moment, anywhere.** Set the time and the place by hand — the useful question is
   usually what will be up at ten tonight from a campsite next week, not what is overhead
   indoors right now.
-- **Step an hour or a day** either way, without typing a date. A day step keeps the hour
-  of the clock, so the same night next week is one button four times, and the chart holds
-  the moment you put it on rather than drifting back to the present.
+  Stepping buttons there move it by an hour or a day either way, so the same night next
+  week is one button four times rather than a date typed out. A day step keeps the hour of
+  the clock, across the end of a month and across a daylight-saving change.
 - **Tap anything** for its designation, magnitude, altitude and bearing.
 
 ## The projection

@@ -20,6 +20,7 @@ import com.wanderwildwood.seizu.BuildConfig
 import com.wanderwildwood.seizu.sky.BodyKind
 import com.wanderwildwood.seizu.sky.SkyBody
 import com.wanderwildwood.seizu.sky.SkyObject
+import com.wanderwildwood.seizu.sky.steppedTime
 import com.wanderwildwood.seizu.sky.SkyStar
 import java.util.GregorianCalendar
 import android.content.Intent
@@ -135,25 +136,65 @@ fun TimeDialog(
     var minute by remember { mutableStateOf(start.get(java.util.Calendar.MINUTE).toString()) }
     var bad by remember { mutableStateOf(false) }
 
+    // Stepping writes back into the same five fields, so the buttons and the typing are
+    // the one answer rather than two ways in. Nothing is charted until "Chart this
+    // moment", which is what lets you step four days and look before committing to it.
+    fun step(hours: Int, days: Int) {
+        val from = GregorianCalendar(
+            year.trim().toIntOrNull() ?: start.get(java.util.Calendar.YEAR),
+            (month.trim().toIntOrNull() ?: (start.get(java.util.Calendar.MONTH) + 1)) - 1,
+            day.trim().toIntOrNull() ?: start.get(java.util.Calendar.DAY_OF_MONTH),
+            hour.trim().toIntOrNull() ?: start.get(java.util.Calendar.HOUR_OF_DAY),
+            minute.trim().toIntOrNull() ?: start.get(java.util.Calendar.MINUTE),
+        )
+        val next = steppedTime(from, hours, days)
+        year = next.get(java.util.Calendar.YEAR).toString()
+        month = (next.get(java.util.Calendar.MONTH) + 1).toString()
+        day = next.get(java.util.Calendar.DAY_OF_MONTH).toString()
+        hour = next.get(java.util.Calendar.HOUR_OF_DAY).toString()
+        minute = next.get(java.util.Calendar.MINUTE).toString()
+        bad = false
+    }
+
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(text = "When", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
 
+        // Three fields on the line their label already describes, rather than stacked: a
+        // date is one fact, and stacked it took two thirds of the dialog's height for it.
         TextMMD(text = "Year, month, day", style = MaterialTheme.typography.labelSmall)
-        TextFieldMMD(value = year, onValueChange = { year = it; bad = false })
-        TextFieldMMD(value = month, onValueChange = { month = it; bad = false })
-        TextFieldMMD(value = day, onValueChange = { day = it; bad = false })
+        Row(modifier = Modifier.fillMaxWidth()) {
+            TextFieldMMD(value = year, onValueChange = { year = it; bad = false }, modifier = Modifier.weight(1.4f))
+            Spacer(Modifier.width(6.dp))
+            TextFieldMMD(value = month, onValueChange = { month = it; bad = false }, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(6.dp))
+            TextFieldMMD(value = day, onValueChange = { day = it; bad = false }, modifier = Modifier.weight(1f))
+        }
         Spacer(Modifier.height(8.dp))
         TextMMD(text = "Hour and minute, on this phone's clock", style = MaterialTheme.typography.labelSmall)
-        TextFieldMMD(value = hour, onValueChange = { hour = it; bad = false })
-        TextFieldMMD(value = minute, onValueChange = { minute = it; bad = false })
+        Row(modifier = Modifier.fillMaxWidth()) {
+            TextFieldMMD(value = hour, onValueChange = { hour = it; bad = false }, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(6.dp))
+            TextFieldMMD(value = minute, onValueChange = { minute = it; bad = false }, modifier = Modifier.weight(1f))
+        }
 
         if (bad) {
             Spacer(Modifier.height(8.dp))
             TextMMD(text = "That is not a date this can chart.", style = MaterialTheme.typography.labelSmall)
         }
 
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(12.dp))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            StepButton("\u2212 day", Modifier.weight(1f)) { step(0, -1) }
+            Spacer(Modifier.width(6.dp))
+            StepButton("\u2212 hr", Modifier.weight(1f)) { step(-1, 0) }
+            Spacer(Modifier.width(6.dp))
+            StepButton("+ hr", Modifier.weight(1f)) { step(1, 0) }
+            Spacer(Modifier.width(6.dp))
+            StepButton("+ day", Modifier.weight(1f)) { step(0, 1) }
+        }
+
+        Spacer(Modifier.height(12.dp))
         OutlinedButtonMMD(
             onClick = {
                 val y = year.trim().toIntOrNull()
@@ -327,4 +368,12 @@ private fun Llama() {
         Spacer(Modifier.width(6.dp))
         TextMMD(text = "Feed the llamas", style = MaterialTheme.typography.labelSmall)
     }
+}
+
+@Composable
+private fun StepButton(label: String, modifier: Modifier, onClick: () -> Unit) {
+    OutlinedButtonMMD(
+        onClick = onClick,
+        modifier = modifier.height(40.dp),
+    ) { TextMMD(text = label, style = MaterialTheme.typography.labelSmall) }
 }
