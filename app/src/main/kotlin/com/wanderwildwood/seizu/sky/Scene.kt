@@ -1,5 +1,7 @@
 package com.wanderwildwood.seizu.sky
 
+import kotlin.math.cos
+
 /**
  * The sky as a list of things to draw, with no drawing in it.
  *
@@ -55,7 +57,42 @@ data class SkyBody(
     val magnitude: Double,
     override val label: String,
     val kind: BodyKind,
+    /** Only the Moon has one. */
+    val phase: MoonPhase? = null,
 ) : SkyObject
+
+/**
+ * How much of the Moon is lit, and which way it is going.
+ *
+ * Worth drawing because it decides what else is worth going out for: a gibbous moon takes
+ * the faint half of this chart away, and no amount of star size makes up for it.
+ */
+data class MoonPhase(
+    /** Lit fraction of the disc: 0 at new, 1 at full. */
+    val illuminated: Double,
+    /** New towards full, rather than full towards new. */
+    val waxing: Boolean,
+)
+
+/**
+ * The Moon's phase, from where the Sun and the Moon are on the ecliptic.
+ *
+ * Elongation is the angle between them as seen from here, and the lit fraction follows
+ * from it directly: `(1 - cos elongation) / 2`, which is 0 when they are in the same
+ * place and 1 when they are opposite. The Sun's ecliptic latitude is zero by definition,
+ * so the Moon's is the only one that enters the separation.
+ *
+ * Waxing is simply whether the Moon is running ahead of the Sun. All three angles are
+ * degrees.
+ */
+fun moonPhase(sunLongitude: Double, moonLongitude: Double, moonLatitude: Double): MoonPhase {
+    val ahead = ((moonLongitude - sunLongitude) % 360.0 + 360.0) % 360.0
+    val cosElongation = cos(Math.toRadians(moonLatitude)) * cos(Math.toRadians(ahead))
+    return MoonPhase(
+        illuminated = ((1.0 - cosElongation) / 2.0).coerceIn(0.0, 1.0),
+        waxing = ahead < 180.0,
+    )
+}
 
 enum class BodyKind { SUN, MOON, PLANET }
 

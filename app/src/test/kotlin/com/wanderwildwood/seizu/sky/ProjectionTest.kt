@@ -402,3 +402,55 @@ class TimeStepTest {
         assertEquals(22, from.get(Calendar.DAY_OF_MONTH))
     }
 }
+
+/**
+ * The Moon's phase.
+ *
+ * All four quarters are fixed points with an answer known without any astronomy: the lit
+ * fraction is a function of one angle, and the four values of that angle that matter are
+ * the ones the words new, first quarter, full and last quarter name.
+ */
+class MoonPhaseTest {
+
+    @Test
+    fun `together in the sky is new moon`() {
+        val phase = moonPhase(sunLongitude = 100.0, moonLongitude = 100.0, moonLatitude = 0.0)
+        assertEquals(0.0, phase.illuminated, 1e-9)
+    }
+
+    @Test
+    fun `opposite is full moon`() {
+        val phase = moonPhase(sunLongitude = 100.0, moonLongitude = 280.0, moonLatitude = 0.0)
+        assertEquals(1.0, phase.illuminated, 1e-9)
+    }
+
+    @Test
+    fun `a quarter turn ahead is half lit and waxing`() {
+        val phase = moonPhase(sunLongitude = 100.0, moonLongitude = 190.0, moonLatitude = 0.0)
+        assertEquals(0.5, phase.illuminated, 1e-9)
+        assertTrue(phase.waxing)
+    }
+
+    @Test
+    fun `a quarter turn behind is half lit and waning`() {
+        val phase = moonPhase(sunLongitude = 100.0, moonLongitude = 10.0, moonLatitude = 0.0)
+        assertEquals(0.5, phase.illuminated, 1e-9)
+        assertTrue(!phase.waxing)
+    }
+
+    @Test
+    fun `the wrap at zero degrees does not flip waxing`() {
+        // Moon at 10 degrees, Sun at 350: the Moon is 20 degrees AHEAD, not 340 behind.
+        val phase = moonPhase(sunLongitude = 350.0, moonLongitude = 10.0, moonLatitude = 0.0)
+        assertTrue(phase.waxing)
+        assertTrue("a young crescent is barely lit", phase.illuminated < 0.05)
+    }
+
+    @Test
+    fun `the Moon's own latitude never lights more than the angle allows`() {
+        // At full, five degrees off the ecliptic leaves it a shade short of wholly lit.
+        val phase = moonPhase(sunLongitude = 0.0, moonLongitude = 180.0, moonLatitude = 5.0)
+        assertTrue(phase.illuminated < 1.0)
+        assertTrue(phase.illuminated > 0.99)
+    }
+}

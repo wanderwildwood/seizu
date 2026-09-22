@@ -495,7 +495,7 @@ public class Astro // visibility widened
      *          beta (ecliptic lat), lambda (ecliptic lon),
      *          Delta (earth distance)
      */
-    static double[] calcPositionSunEcliptic(double jd)
+    public static double[] calcPositionSunEcliptic(double jd) // visibility widened
     {
         double n, L, g, lamb;
         n = jd - 2451545.0;

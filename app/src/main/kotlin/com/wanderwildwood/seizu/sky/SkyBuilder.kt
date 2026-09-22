@@ -256,8 +256,16 @@ class SkyBuilder(
         // has to be converted before it means anything in the observer's sky.
         val moon = Astro.calcPositionMoon(julianDay)
         val moonEquatorial = Astro.geoEcl2geoEqua(moon[0], moon[1])
+        // The phase wants both of them back on the ecliptic, where the angle between them
+        // is the whole of it. The Sun is asked a second time, in those terms.
+        val sunEcliptic = Astro.calcPositionSunEcliptic(julianDay)
+        val phase = moonPhase(
+            sunLongitude = sunEcliptic[1],
+            moonLongitude = moon[1],
+            moonLatitude = moon[0],
+        )
         toHorizontal(moonEquatorial[0] / 15.0, moonEquatorial[1]).let {
-            add(SkyBody(it[0], it[1], -12.7, "Moon", BodyKind.MOON))
+            add(SkyBody(it[0], it[1], -12.7, "Moon", BodyKind.MOON, phase))
         }
 
         val earth = Planet.sEarth ?: return@buildList

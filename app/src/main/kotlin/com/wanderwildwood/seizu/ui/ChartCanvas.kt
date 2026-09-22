@@ -14,6 +14,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
@@ -32,6 +33,7 @@ import com.wanderwildwood.seizu.sky.CARDINALS
 import com.wanderwildwood.seizu.sky.LineKind
 import com.wanderwildwood.seizu.sky.Layers
 import com.wanderwildwood.seizu.sky.MarkWeight
+import com.wanderwildwood.seizu.sky.MoonPhase
 import com.wanderwildwood.seizu.sky.Projection
 import com.wanderwildwood.seizu.sky.Scene
 import com.wanderwildwood.seizu.sky.SkyObject
@@ -165,7 +167,10 @@ fun ChartCanvas(
                 center = Offset(x, y),
                 style = Stroke(width = (1.dp.toPx() * weight.scale).coerceAtLeast(1f)),
             )
-            if (body.kind == BodyKind.SUN || body.kind == BodyKind.MOON) {
+            val phase = body.phase
+            if (body.kind == BodyKind.MOON && phase != null) {
+                drawMoonPhase(Offset(x, y), radius, phase)
+            } else if (body.kind == BodyKind.SUN || body.kind == BodyKind.MOON) {
                 drawCircle(Color.Black, radius = base * 0.7f, center = Offset(x, y))
             }
             if (layers.solarNames) {
@@ -409,6 +414,44 @@ private fun DrawScope.drawLabels(measurer: TextMeasurer, labels: List<Label>) {
         drawRect(Color.White, topLeft = Offset(box.left, box.top), size = Size(box.width, box.height))
         drawText(layout, topLeft = Offset(left, top))
     }
+}
+
+/**
+ * The lit part of the Moon, inside the ring already drawn for it.
+ *
+ * The terminator is upright rather than turned to face the real Sun. A chart mark
+ * seventeen pixels across cannot carry a position angle -- at that size the tilt reads as
+ * a drawing error, not as information -- and what is actually wanted from a glance is how
+ * much moon there will be. So this is an almanac's symbol: lit on the right waxing, on
+ * the left waning, the way the phase is printed in every diary.
+ *
+ * The shape is the standard one. Half the disc is lit; the terminator is the edge of an
+ * ellipse whose width is how far the phase is from half. Past half that ellipse is added
+ * to the lit half, before half it is taken out of it, and at half there is nothing to do.
+ */
+private fun DrawScope.drawMoonPhase(centre: Offset, radius: Float, phase: MoonPhase) {
+    val lit = phase.illuminated.toFloat()
+    // Within a pixel of either end there is no crescent to draw, and the ellipse below
+    // degenerates. New stays the empty ring the other bodies get; full is simply filled.
+    if (lit <= 0.03f) return
+    if (lit >= 0.97f) {
+        drawCircle(Color.Black, radius = radius, center = centre)
+        return
+    }
+
+    val box = Rect(centre.x - radius, centre.y - radius, centre.x + radius, centre.y + radius)
+    // Sweeping clockwise from the top gives the right-hand half, which is the waxing side.
+    val halfStart = if (phase.waxing) -90f else 90f
+    val half = Path().apply { arcTo(box, halfStart, 180f, true); close() }
+
+    val waist = radius * (2f * lit - 1f)
+    val terminator = Path().apply {
+        addOval(Rect(centre.x - abs(waist), centre.y - radius, centre.x + abs(waist), centre.y + radius))
+    }
+
+    val shape = Path()
+    shape.op(half, terminator, if (waist > 0f) PathOperation.Union else PathOperation.Difference)
+    drawPath(shape, Color.Black)
 }
 
 /** The object nearest a tap, within [tolerance] pixels, or null. */
