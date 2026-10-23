@@ -32,7 +32,8 @@ for.
   screen with no brightness to spare, size carries the whole of that information.
 - **The constellation figures**, their names — in Latin, in English or as the three-letter
   abbreviation — and, if you want them, the IAU boundaries.
-- **Sun, Moon and the planets**, drawn as rings so they are never mistaken for stars.
+- **Sun, Moon and the planets**, drawn as rings so they are never mistaken for stars. The Moon
+  is drawn with its phase, and tapping it says the phase in words.
 - **The ecliptic, the celestial equator, a declination grid and circles of altitude**,
   each optional.
 - **Zoom.** Pinch, or the − and + either side of the facing button; drag to move about;
@@ -142,6 +143,17 @@ symmetric cases hide sign errors.
 Two real mistakes were caught that way while this was being built: the library returns
 `(right ascension, declination)` in **degrees** where the horizontal conversion wants right
 ascension in **hours**, and it measures azimuth **from south**, not from north.
+
+## Getting it, and keeping it
+
+Download <https://github.com/wanderwildwood/seizu/releases/latest/download/seizu.apk>
+and sideload it. That address always points at the newest release, and every release
+publishes a `.sha256` beside the APK if you would rather check than trust.
+
+For updates without doing this by hand, add this repository to
+[Obtainium](https://github.com/ImranR98/Obtainium):
+
+    https://github.com/wanderwildwood/seizu
 
 ## Licence
 
