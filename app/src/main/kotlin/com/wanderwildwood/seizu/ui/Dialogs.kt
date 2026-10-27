@@ -26,6 +26,14 @@ import com.wanderwildwood.seizu.sky.SkyStar
 import java.util.GregorianCalendar
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.platform.LocalConfiguration
 import android.net.Uri
@@ -40,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.wanderwildwood.seizu.R
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
@@ -60,8 +69,13 @@ fun LocationDialog(
     onUseGps: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var lat by rememberSaveable { mutableStateOf(latitude.toString()) }
-    var lon by rememberSaveable { mutableStateOf(longitude.toString()) }
+    // The numbers without their signs, and the side of the equator and of Greenwich as a
+    // button beside each: a number keyboard does not always have a minus on it, and a
+    // longitude west of Greenwich typed without one is the other side of the world.
+    var lat by rememberSaveable { mutableStateOf(abs(latitude).toString()) }
+    var lon by rememberSaveable { mutableStateOf(abs(longitude).toString()) }
+    var north by rememberSaveable { mutableStateOf(latitude >= 0) }
+    var east by rememberSaveable { mutableStateOf(longitude >= 0) }
     var bad by rememberSaveable { mutableStateOf(false) }
 
     EInkDialog(onDismiss = onDismiss) {
@@ -69,10 +83,22 @@ fun LocationDialog(
         Spacer(Modifier.height(12.dp))
         TwoSides(first = {
             TextMMD(text = stringResource(R.string.where_latitude), style = MaterialTheme.typography.labelSmall)
-            TextFieldMMD(value = lat, onValueChange = { lat = it; bad = false })
+            DegreesField(
+                value = lat,
+                onValue = { lat = it; bad = false },
+                side = stringResource(if (north) R.string.compass_north else R.string.compass_south),
+                sideDescription = stringResource(R.string.where_cd_north_south),
+                onSide = { north = !north },
+            )
             Spacer(Modifier.height(10.dp))
             TextMMD(text = stringResource(R.string.where_longitude), style = MaterialTheme.typography.labelSmall)
-            TextFieldMMD(value = lon, onValueChange = { lon = it; bad = false })
+            DegreesField(
+                value = lon,
+                onValue = { lon = it; bad = false },
+                side = stringResource(if (east) R.string.compass_east else R.string.compass_west),
+                sideDescription = stringResource(R.string.where_cd_east_west),
+                onSide = { east = !east },
+            )
 
             if (bad) {
                 Spacer(Modifier.height(8.dp))
@@ -84,8 +110,8 @@ fun LocationDialog(
         }, second = {
             OutlinedButtonMMD(
                 onClick = {
-                    val la = lat.trim().toDoubleOrNull()
-                    val lo = lon.trim().toDoubleOrNull()
+                    val la = signed(lat, north)
+                    val lo = signed(lon, east)
                     if (la == null || lo == null || la < -90 || la > 90 || lo < -180 || lo > 180) {
                         bad = true
                     } else {
@@ -169,18 +195,18 @@ fun TimeDialog(
             // date is one fact, and stacked it took two thirds of the dialog's height for it.
             TextMMD(text = stringResource(R.string.when_date), style = MaterialTheme.typography.labelSmall)
             Row(modifier = Modifier.fillMaxWidth()) {
-                TextFieldMMD(value = year, onValueChange = { year = it; bad = false }, modifier = Modifier.weight(1.4f))
+                NumberField(value = year, onValue = { year = it; bad = false }, modifier = Modifier.weight(1.4f))
                 Spacer(Modifier.width(6.dp))
-                TextFieldMMD(value = month, onValueChange = { month = it; bad = false }, modifier = Modifier.weight(1f))
+                NumberField(value = month, onValue = { month = it; bad = false }, modifier = Modifier.weight(1f))
                 Spacer(Modifier.width(6.dp))
-                TextFieldMMD(value = day, onValueChange = { day = it; bad = false }, modifier = Modifier.weight(1f))
+                NumberField(value = day, onValue = { day = it; bad = false }, modifier = Modifier.weight(1f))
             }
             Spacer(Modifier.height(8.dp))
             TextMMD(text = stringResource(R.string.when_time), style = MaterialTheme.typography.labelSmall)
             Row(modifier = Modifier.fillMaxWidth()) {
-                TextFieldMMD(value = hour, onValueChange = { hour = it; bad = false }, modifier = Modifier.weight(1f))
+                NumberField(value = hour, onValue = { hour = it; bad = false }, modifier = Modifier.weight(1f))
                 Spacer(Modifier.width(6.dp))
-                TextFieldMMD(value = minute, onValueChange = { minute = it; bad = false }, modifier = Modifier.weight(1f))
+                NumberField(value = minute, onValue = { minute = it; bad = false }, modifier = Modifier.weight(1f))
             }
 
             if (bad) {
@@ -292,45 +318,66 @@ private fun Line(label: String, value: String) {
     Spacer(Modifier.height(4.dp))
 }
 
+/**
+ * What this is, what it does with what you tell it, and the terms.
+ *
+ * The words run on a [PagedColumn] inside the dialog, with Close below it: with Privacy and
+ * Terms added the About is longer than the panel is tall when the phone is on its side, and
+ * a dialog cut off at the foot hides exactly the part that was added to be read.
+ */
 @Composable
 fun AboutDialog(onDismiss: () -> Unit) {
     EInkDialog(onDismiss = onDismiss) {
-        TextMMD(
-            text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-        )
+        PagedColumn(modifier = Modifier.weight(1f, fill = false)) {
+            item {
+                Column {
+                    TextMMD(
+                        text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.semantics { heading() },
+                    )
+                    Spacer(Modifier.height(14.dp))
+                }
+            }
+            item { Paragraph(stringResource(R.string.about_black_on_white)) }
+            item { Paragraph(stringResource(R.string.about_catalogue)) }
+            item { Paragraph(stringResource(R.string.about_after)) }
+            item { Section(stringResource(R.string.about_privacy_heading), stringResource(R.string.about_privacy_body)) }
+            item { Section(stringResource(R.string.about_terms_heading), stringResource(R.string.about_terms_body)) }
+            item { Paragraph(stringResource(R.string.about_icons)) }
+            item { Llama() }
+        }
 
-        Spacer(Modifier.height(14.dp))
-        TextMMD(
-            text = stringResource(R.string.about_black_on_white),
-            style = MaterialTheme.typography.labelSmall,
-        )
-
-        Spacer(Modifier.height(14.dp))
-        TextMMD(
-            text = stringResource(R.string.about_privacy),
-            style = MaterialTheme.typography.labelSmall,
-        )
-
-        Spacer(Modifier.height(14.dp))
-        TextMMD(
-            text = stringResource(R.string.about_after),
-            style = MaterialTheme.typography.labelSmall,
-        )
-
-        Spacer(Modifier.height(14.dp))
-        TextMMD(text = stringResource(R.string.about_licence), style = MaterialTheme.typography.labelSmall)
-        TextMMD(text = stringResource(R.string.about_icons), style = MaterialTheme.typography.labelSmall)
-
-        Spacer(Modifier.height(14.dp))
-        Llama()
-
-        Spacer(Modifier.height(18.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
         ) { TextMMD(text = stringResource(R.string.about_close), style = MaterialTheme.typography.bodySmall) }
+    }
+}
+
+@Composable
+private fun Paragraph(text: String) {
+    Column {
+        TextMMD(text = text, style = MaterialTheme.typography.labelSmall)
+        Spacer(Modifier.height(12.dp))
+    }
+}
+
+/** A heading and its words as one row, so a page never ends on a heading alone. */
+@Composable
+private fun Section(heading: String, body: String) {
+    Column {
+        TextMMD(
+            text = heading,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.semantics { heading() },
+        )
+        Spacer(Modifier.height(4.dp))
+        TextMMD(text = body, style = MaterialTheme.typography.labelSmall)
+        Spacer(Modifier.height(12.dp))
     }
 }
 
@@ -366,7 +413,8 @@ private fun Llama() {
                         Toast.makeText(context, context.getString(R.string.about_no_browser), Toast.LENGTH_SHORT).show()
                     }
                 }
-                .padding(vertical = 4.dp),
+                .heightIn(min = 48.dp)
+                .wrapContentHeight(Alignment.CenterVertically),
         )
         Spacer(Modifier.width(6.dp))
         Row(
@@ -386,7 +434,7 @@ private fun Llama() {
                         Toast.makeText(context, context.getString(R.string.about_no_browser), Toast.LENGTH_SHORT).show()
                     }
                 }
-                .padding(vertical = 4.dp),
+                .heightIn(min = 48.dp),
         ) {
             Image(
                 painter = painterResource(R.drawable.llama),
@@ -397,6 +445,55 @@ private fun Llama() {
             TextMMD(text = stringResource(R.string.about_feed_the_llamas), style = MaterialTheme.typography.labelSmall)
         }
     }
+}
+
+/**
+ * A number typed without its sign, given the sign of the side chosen beside it. A minus
+ * typed anyway, on a keyboard that has one, turns the side over rather than being lost.
+ */
+private fun signed(text: String, positiveSide: Boolean): Double? {
+    val value = text.trim().replace(',', '.').toDoubleOrNull() ?: return null
+    return if (positiveSide) value else -value
+}
+
+/** A number of degrees, with the side it lies on as a button after it. */
+@Composable
+private fun DegreesField(
+    value: String,
+    onValue: (String) -> Unit,
+    side: String,
+    sideDescription: String,
+    onSide: () -> Unit,
+) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        TextFieldMMD(
+            value = value,
+            onValueChange = onValue,
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        )
+        Spacer(Modifier.width(8.dp))
+        OutlinedButtonMMD(
+            onClick = onSide,
+            modifier = Modifier
+                .size(48.dp)
+                .semantics { contentDescription = sideDescription },
+            contentPadding = PaddingValues(0.dp),
+        ) { TextMMD(text = side, style = MaterialTheme.typography.bodyMedium) }
+    }
+}
+
+/** A short whole number, typed on the number keyboard. */
+@Composable
+private fun NumberField(value: String, onValue: (String) -> Unit, modifier: Modifier) {
+    TextFieldMMD(
+        value = value,
+        onValueChange = onValue,
+        modifier = modifier,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+    )
 }
 
 /**
@@ -424,6 +521,8 @@ private fun TwoSides(first: @Composable () -> Unit, second: @Composable () -> Un
 private fun StepButton(label: String, modifier: Modifier, onClick: () -> Unit) {
     OutlinedButtonMMD(
         onClick = onClick,
-        modifier = modifier.height(40.dp),
-    ) { TextMMD(text = label, style = MaterialTheme.typography.labelSmall) }
+        modifier = modifier.height(48.dp),
+        // Four to a row: the default padding left "− day" no room and folded it in two.
+        contentPadding = PaddingValues(horizontal = 2.dp),
+    ) { TextMMD(text = label, style = MaterialTheme.typography.labelSmall, maxLines = 1) }
 }

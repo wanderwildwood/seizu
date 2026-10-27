@@ -82,9 +82,12 @@
 
     <string name="where_title">Where</string>
     <!-- Labels above the two number fields -->
-    <string name="where_latitude">Latitude, degrees north</string>
-    <string name="where_longitude">Longitude, degrees east</string>
-    <string name="where_out_of_range">Latitude runs -90 to 90, longitude -180 to 180.</string>
+    <string name="where_latitude">Latitude, degrees</string>
+    <string name="where_longitude">Longitude, degrees</string>
+    <!-- The N/S and E/W buttons beside the two fields, read aloud by a screen reader -->
+    <string name="where_cd_north_south">North or south of the equator; tap to change</string>
+    <string name="where_cd_east_west">East or west of Greenwich; tap to change</string>
+    <string name="where_out_of_range">Latitude runs 0 to 90, longitude 0 to 180.</string>
     <!-- Button: chart from the typed place -->
     <string name="where_use_this">Use this</string>
     <string name="where_ask_gps">Ask the GPS</string>
@@ -158,12 +161,12 @@
     <string name="settings_cd_close">Close</string>
     <string name="settings_cd_about">About</string>
 
-    <!-- The magnitude limit row. %1$.0f is the magnitude, 3 to 6 -->
+    <!-- The magnitude limit row. Its value: %1$.0f is the magnitude, 3 to 6, and %2$s one of the three short notes below, saying roughly what that limit shows -->
     <string name="settings_faintest_star">Faintest star</string>
-    <string name="settings_magnitude_value">magnitude %1$.0f</string>
-    <string name="settings_magnitude_note_bright">The bright ones only.</string>
-    <string name="settings_magnitude_note_town">About what a town sky gives you.</string>
-    <string name="settings_magnitude_note_dark">About what a dark night gives the naked eye.</string>
+    <string name="settings_magnitude_value">%1$.0f · %2$s</string>
+    <string name="settings_magnitude_note_bright">bright ones</string>
+    <string name="settings_magnitude_note_town">a town sky</string>
+    <string name="settings_magnitude_note_dark">a dark sky</string>
 
     <!-- How heavy the chart's lines and dots are drawn -->
     <string name="settings_mark_weight">Mark weight</string>
@@ -171,28 +174,23 @@
     <string name="settings_mark_weight_fine">Fine</string>
     <string name="settings_mark_weight_medium">Medium</string>
     <string name="settings_mark_weight_bold">Bold</string>
-    <string name="settings_mark_weight_note_fine">A hairline chart. Most sky, least ink.</string>
-    <string name="settings_mark_weight_note_medium">What a paper atlas prints at.</string>
-    <string name="settings_mark_weight_note_bold">For gloves, torchlight and tired eyes.</string>
 
     <!-- Layer toggles -->
     <!-- The stick figures joining a constellation's stars -->
     <string name="settings_constellation_figures">Constellation figures</string>
+    <!-- Its value is Off or one of the three kinds of name below -->
     <string name="settings_constellation_names">Constellation names</string>
-    <!-- Row under constellation names: which kind of name to show (Latin, English or abbreviation) -->
-    <string name="settings_call_them">Call them</string>
-    <!-- One example of each kind: Latin name, English name, IAU abbreviation. Keep "Andromeda" and "And." -->
-    <string name="settings_call_them_note">Andromeda, Chained Maiden, And.</string>
-    <!-- Its three values: which kind of name. "English" is the English translation of the Latin, e.g. Great Bear; the names themselves come from the catalogue in English -->
+    <!-- The three kinds of name. "English" is the English translation of the Latin, e.g. Great Bear; the names themselves come from the catalogue in English -->
     <string name="settings_call_them_latin">Latin</string>
     <string name="settings_call_them_english">English</string>
     <!-- The three-letter IAU abbreviation, e.g. UMa -->
     <string name="settings_call_them_abbreviation">Abbreviation</string>
     <string name="settings_constellation_boundaries">Constellation boundaries</string>
     <string name="settings_star_names">Star names</string>
+    <!-- Its value is Off, or one of the two below: drawn with their names beside them, or without -->
     <string name="settings_solar_system">Sun, Moon and planets</string>
-    <!-- Row under "Sun, Moon and planets": label them on the chart -->
-    <string name="settings_solar_names">Name them</string>
+    <string name="settings_solar_named">Named</string>
+    <string name="settings_solar_unnamed">Unnamed</string>
     <string name="settings_ecliptic">Ecliptic</string>
     <string name="settings_equator">Celestial equator</string>
     <string name="settings_grid">Declination grid</string>
@@ -209,10 +207,15 @@
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Star Chart %1$s</string>
     <string name="about_black_on_white">Black on white, like a paper chart. A screen full of black would be unreadable outdoors and slow to redraw here.</string>
-    <string name="about_privacy">Stars from the Yale Bright Star Catalogue. Positions are computed on the phone; nothing is fetched and nothing is sent.</string>
+    <string name="about_catalogue">Stars from the Yale Bright Star Catalogue. Every position is computed on the phone.</string>
+    <!-- Heading above the privacy paragraph -->
+    <string name="about_privacy_heading">Privacy</string>
+    <!-- "Ask the GPS" and "Point" are the names of buttons in the app; keep them the same as there -->
+    <string name="about_privacy_body">Everything you put in this app stays on this phone. It has no internet access, so nothing is sent anywhere, and nothing is collected about you. It asks for your rough location only when you press Ask the GPS. The compass and motion sensors are read on the phone only while Point is on. There are no ads, no analytics and no tracking.</string>
+    <!-- Heading above the terms paragraph -->
+    <string name="about_terms_heading">Terms</string>
+    <string name="about_terms_body">This app is free software under the GNU General Public License v3 or later. It comes with no warranty: use it at your own risk.</string>
     <string name="about_after">After AndroidPlanisphere by Timo Engel, whose astronomy this runs on unchanged.</string>
-    <!-- The name of the app's licence -->
-    <string name="about_licence">GNU General Public License v3 or later</string>
     <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
     <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
     <string name="about_feed_the_llamas">feed the llamas</string>
