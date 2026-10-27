@@ -41,10 +41,10 @@
     <string name="compass_west">W</string>
 
     <!-- The button under the chart that turns it: which compass point is at the top -->
-    <string name="chart_facing_north">North up</string>
-    <string name="chart_facing_east">East up</string>
-    <string name="chart_facing_south">South up</string>
-    <string name="chart_facing_west">West up</string>
+    <string name="chart_facing_north">Facing north</string>
+    <string name="chart_facing_east">Facing east</string>
+    <string name="chart_facing_south">Facing south</string>
+    <string name="chart_facing_west">Facing west</string>
     <!-- The same button when zoomed in. %1$s is one of the four above, %2$.1f the zoom (×2.5 means two and a half times). Keep the two spaces, and the quotes that keep them -->
     <string name="chart_facing_zoomed">"%1$s  ×%2$.1f"</string>
 
