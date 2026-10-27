@@ -78,6 +78,8 @@ fun ChartCanvas(
     onPan: (Float, Float) -> Unit,
     onResetView: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Point's cross in the middle of the canvas, and what a tap on it does. */
+    onCrossTap: (() -> Unit)? = null,
 ) {
     val measurer = rememberTextMeasurer()
     val density = LocalDensity.current
@@ -88,6 +90,8 @@ fun ChartCanvas(
     // pair of lambdas happened to exist when the first finger went down.
     val zoomBy by rememberUpdatedState(onZoom)
     val panBy by rememberUpdatedState(onPan)
+    val crossTap by rememberUpdatedState(onCrossTap)
+    val crossReachPx = with(density) { CROSS_REACH.toPx() }
     // Words are looked up here, where there are resources, and handed to the drawing.
     val cardinalNames = CARDINALS.map { (key, _) -> stringResource(cardinalName(key)) }
     val bodyNames = scene.bodies.map { bodyName(it) }
@@ -118,6 +122,15 @@ fun ChartCanvas(
                     // button, and there is no room for a third one.
                     onDoubleTap = { onResetView() },
                     onTap = { tap ->
+                        // The cross is never exactly on what it names, so a tap on it opens
+                        // the thing named under the chart rather than whatever dot is nearest.
+                        val onCross = crossTap
+                        if (onCross != null &&
+                            hypot(tap.x - size.width / 2f, tap.y - size.height / 2f) <= crossReachPx
+                        ) {
+                            onCross()
+                            return@detectTapGestures
+                        }
                         val projection = chartProjection(
                             size.width.toFloat(), size.height.toFloat(),
                             insetPx, zoom, panX, panY, facing,
@@ -199,8 +212,32 @@ fun ChartCanvas(
         labels += starLabels
 
         drawLabels(measurer, labels)
+
+        if (onCrossTap != null) drawCross(weight)
     }
 }
+
+/**
+ * Point's cross: four short strokes round the middle of the canvas, open in the centre so
+ * the star it is on is not hidden under it.
+ */
+private fun DrawScope.drawCross(weight: MarkWeight) {
+    val centre = Offset(size.width / 2f, size.height / 2f)
+    val gap = 5.dp.toPx()
+    val arm = 16.dp.toPx()
+    val stroke = (1.5.dp.toPx() * weight.scale).coerceAtLeast(1f)
+    listOf(Offset(1f, 0f), Offset(-1f, 0f), Offset(0f, 1f), Offset(0f, -1f)).forEach { d ->
+        drawLine(
+            Color.Black,
+            start = centre + d * gap,
+            end = centre + d * arm,
+            strokeWidth = stroke,
+        )
+    }
+}
+
+/** How near the middle a tap counts as a tap on the cross: a thumb's width round it. */
+private val CROSS_REACH = 32.dp
 
 /** A word waiting to be put on the chart, once it is known whether there is room. */
 private class Label(

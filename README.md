@@ -45,6 +45,27 @@ for.
   week is one button four times rather than a date typed out. A day step keeps the hour of
   the clock, across the end of a month and across a daylight-saving change.
 - **Tap anything** for its designation, magnitude, altitude and bearing.
+- **Point.** Hold the phone up with its back to the sky and press **Point**: the chart turns
+  to the way the phone faces and closes in on the patch of sky it points at, a small cross
+  marks the middle, and the nearest named thing is written underneath ("Jupiter", "Vega, in
+  Lyra"). Tap the cross or the name for its details. **Hold** freezes the view; **Whole sky**
+  or Back returns to the full chart where you left it.
+- **Sideways too.** The chart and its dialogs work in landscape, and "Turn sideways with the
+  phone" in the settings (on to start with) turns them by the phone's own sensor, since the
+  Kompakt has no auto-rotate switch of its own.
+
+## Point, on an E Ink panel
+
+The panel cannot follow a phone being swung about, so Point does not try. While the phone
+moves, the picture stays as it was; once it has come to rest more than about five degrees
+from where the picture was drawn, and held there for a moment, the chart is drawn once for
+the new place. The shake of a hand never redraws it.
+
+"Pointing" is the direction out of the **back** of the phone, the way you would hold it up to
+photograph something. High overhead, where that direction has no bearing to speak of, the
+way the screen's top edge leans takes over. The compass and motion sensors are read only
+while Point is on and the app is in front, and when the phone says its compass is unsure,
+the chart says so: "Compass unsure — move the phone in a figure 8".
 
 ## The projection
 
@@ -86,6 +107,9 @@ A chart you cannot orient is not a chart.
 One permission, `ACCESS_COARSE_LOCATION`, and only if you press "Ask the GPS". Typing a
 latitude and longitude works without granting anything, and is the only way to chart
 somewhere you are not.
+
+Point reads the compass and motion sensors, which need no permission, and only while it is
+on and the app is in front. See [PRIVACY.md](PRIVACY.md).
 
 **No `INTERNET` permission.** The catalogue ships inside the app and every position is
 computed on the phone.

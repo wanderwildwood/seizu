@@ -31,6 +31,8 @@ data class SkyStar(
     val hr: Int,
     /** Greek-letter designation within its constellation, where it has one. */
     val bayerFlamsteed: String,
+    /** The constellation it is in, as the chart names constellations; only named stars carry it. */
+    val constellation: String? = null,
 ) : SkyObject {
     /**
      * The designation with a space where the catalogue has none.

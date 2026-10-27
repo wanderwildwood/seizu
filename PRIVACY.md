@@ -26,10 +26,20 @@ on the phone, so there is nothing to fetch and no way to send.
 
 There is no background location permission, and no service.
 
+## The compass and motion sensors, only while Point is on
+
+**Point** turns the chart to the way the phone faces. For that it reads the phone's compass
+and motion sensors (the fused rotation vector, and the magnetometer's accuracy so it can say
+when the compass is unsure). They need no permission. They are read on the phone only while
+Point is on and the app is in front: the listener is registered when Point comes on or the
+app comes back, and unregistered when Point goes off, the view is held, or the app goes into
+the background. Readings are turned into a direction and drawn; none is stored.
+
 ## What is stored
 
-Your chosen latitude and longitude, which way the chart is turned, and which layers are
-switched on. All in `SharedPreferences`, all visible in `sky/Preferences.kt`.
+Your chosen latitude and longitude, which way the chart is turned, whether it turns
+sideways with the phone, and which layers are switched on. Where Point is looking is not
+stored. All in `SharedPreferences`, all visible in `sky/Preferences.kt`.
 
 No history, no log of where you have been, no record of what you looked at.
 

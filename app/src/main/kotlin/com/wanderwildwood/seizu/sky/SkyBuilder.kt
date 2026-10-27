@@ -55,6 +55,13 @@ class SkyBuilder(
                     label = entry.name,
                     hr = entry.hr,
                     bayerFlamsteed = entry.bayerFlamsteed ?: "",
+                    // Only a star with a name is ever named under Point's cross, so only
+                    // those are looked up: nine thousand lookups a rebuild would be waste.
+                    constellation = if (entry.name != null) {
+                        constellationOf(entry.bayerFlamsteed, layers.naming)
+                    } else {
+                        null
+                    },
                 )
             }
             .filter { it.isAboveHorizon }
@@ -103,6 +110,21 @@ class SkyBuilder(
             moment = time.time,
             place = Place(latitude, longitude),
         )
+    }
+
+    /**
+     * The constellation a star belongs to, from the abbreviation that ends its designation
+     * ("3Alp Lyr" is in Lyra), worded as the chart words constellations.
+     *
+     * Abbreviations are worded in Latin instead: "Vega, in Lyr" reads as a typo. Null for a
+     * star with no Bayer or Flamsteed designation, which says nothing about where it is.
+     */
+    private fun constellationOf(designation: String?, naming: ConstellationNaming): String? {
+        val abbreviation = designation?.trim()?.takeLast(3)?.lowercase(java.util.Locale.ROOT) ?: return null
+        if (abbreviation.length != 3 || !abbreviation.all { it.isLetter() }) return null
+        val column = if (naming == ConstellationNaming.ABBREVIATION) ConstellationNaming.LATIN.column else naming.column
+        val name = constellations.getName(abbreviation, column)
+        return name.takeIf { it != abbreviation }
     }
 
     /**

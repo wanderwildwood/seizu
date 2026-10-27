@@ -28,6 +28,26 @@ data class ChartState(
     val loading: Boolean = true,
     val usingGps: Boolean = false,
     val selected: SkyObject? = null,
+    /** Non-null while Point is on. Never saved: it is a way of looking, not a setting. */
+    val pointing: Pointing? = null,
+    /** Whether the app turns sideways with the phone. */
+    val turnWithPhone: Boolean = true,
+)
+
+/**
+ * Point, while it is on.
+ *
+ * The whole-sky chart's facing, zoom and pan are left exactly as they were in [ChartState]
+ * and this sits beside them, so pressing Point again goes back to the map where it was left.
+ */
+data class Pointing(
+    /** The direction the picture is drawn for; null until the phone has first settled. */
+    val aim: Aim? = null,
+    val zoom: Float = POINT_ZOOM,
+    /** The view is frozen: the sensors are off and the picture stays put. */
+    val held: Boolean = false,
+    /** The compass says it is confused. */
+    val compassUnsure: Boolean = false,
 )
 
 class ChartViewModel(application: Application) : AndroidViewModel(application) {
@@ -40,11 +60,14 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
             latitude = preferences.latitude,
             longitude = preferences.longitude,
             facing = preferences.facing,
+            turnWithPhone = preferences.turnWithPhone,
         )
     )
     val state: StateFlow<ChartState> = _state.asStateFlow()
 
     private var builder: SkyBuilder? = null
+
+    private val settler = Settler()
 
     /**
      * Parse the catalogues, then draw the sky.
@@ -102,6 +125,51 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(facing = next) }
     }
 
+    fun setTurnWithPhone(on: Boolean) {
+        preferences.turnWithPhone = on
+        _state.update { it.copy(turnWithPhone = on) }
+    }
+
+    /** Point on, or back to the whole sky where it was left. */
+    fun togglePoint() {
+        if (_state.value.pointing != null) {
+            stopPoint()
+        } else {
+            settler.reset()
+            _state.update { it.copy(pointing = Pointing()) }
+        }
+    }
+
+    fun stopPoint() = _state.update { it.copy(pointing = null) }
+
+    /** Freeze the view, or let it follow the phone again from where it is drawn. */
+    fun toggleHold() {
+        val pointing = _state.value.pointing ?: return
+        if (pointing.held) settler.resume()
+        _state.update { it.copy(pointing = pointing.copy(held = !pointing.held)) }
+    }
+
+    /**
+     * One reading from the sensors. The state changes only when the settler says the phone
+     * has come to rest somewhere new, so a phone being swung about redraws nothing.
+     */
+    fun onAim(aim: Aim, atMillis: Long) {
+        val pointing = _state.value.pointing ?: return
+        if (pointing.held) return
+        val settled = settler.offer(aim, atMillis) ?: return
+        _state.update { current ->
+            current.pointing?.let { current.copy(pointing = it.copy(aim = settled)) } ?: current
+        }
+    }
+
+    fun setCompassUnsure(unsure: Boolean) {
+        val pointing = _state.value.pointing ?: return
+        if (pointing.compassUnsure == unsure) return
+        _state.update { current ->
+            current.pointing?.let { current.copy(pointing = it.copy(compassUnsure = unsure)) } ?: current
+        }
+    }
+
     /**
      * Zoom is drawing, not astronomy, so it never rebuilds the scene either.
      *
@@ -111,6 +179,12 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
      * looking at off the edge on every press.
      */
     fun zoomBy(factor: Float) {
+        _state.value.pointing?.let { pointing ->
+            // Point keeps its own zoom, so the whole-sky chart's is there to go back to.
+            val zoom = (pointing.zoom * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
+            _state.update { it.copy(pointing = pointing.copy(zoom = zoom)) }
+            return
+        }
         _state.update { current ->
             val zoom = (current.zoom * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
             val scale = zoom / current.zoom
@@ -121,6 +195,8 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Drag the view over the chart, in radii of the unzoomed disc. */
     fun panBy(dx: Float, dy: Float) {
+        // In Point the phone decides where the view is, not a finger.
+        if (_state.value.pointing != null) return
         _state.update { current ->
             val (panX, panY) = clampPan(current.panX + dx, current.panY + dy, current.zoom)
             current.copy(panX = panX, panY = panY)
@@ -128,7 +204,10 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /** The whole sky on the screen again: the way out of being lost in a zoomed chart. */
-    fun resetView() = _state.update { it.copy(zoom = MIN_ZOOM, panX = 0f, panY = 0f) }
+    fun resetView() {
+        if (_state.value.pointing != null) return
+        _state.update { it.copy(zoom = MIN_ZOOM, panX = 0f, panY = 0f) }
+    }
 
     fun select(objectAt: SkyObject?) = _state.update { it.copy(selected = objectAt) }
 }

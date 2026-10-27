@@ -3,11 +3,13 @@ package com.wanderwildwood.seizu
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,9 +18,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mudita.mmd.ThemeMMD
@@ -49,26 +53,68 @@ class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContent {
+            val viewModel: ChartViewModel = viewModel()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            val pointing = state.pointing != null
+            LaunchedEffect(state.turnWithPhone, pointing) { turnWithPhone(state.turnWithPhone, pointing) }
             ThemeMMD(colorScheme = monochrome) {
-                StarChart()
+                StarChart(viewModel)
             }
+        }
+    }
+
+    /**
+     * Sideways with the phone by the sensor itself when the setting is on, since the Kompakt
+     * gives no way to switch its own auto-rotate on; otherwise as the phone's setting says.
+     *
+     * While Point is on the window stays whichever way it was when Point was pressed. Tipping
+     * a phone back towards the zenith is exactly the movement that makes Android's own
+     * rotation guess flip the screen, and a flip would redraw the whole panel mid-look.
+     */
+    private fun turnWithPhone(on: Boolean, pointing: Boolean) {
+        requestedOrientation = when {
+            pointing -> ActivityInfo.SCREEN_ORIENTATION_LOCKED
+            on -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            else -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }
 }
 
 @Composable
-private fun StarChart(viewModel: ChartViewModel = viewModel()) {
+private fun StarChart(viewModel: ChartViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    var settingsOpen by remember { mutableStateOf(false) }
-    var whenOpen by remember { mutableStateOf(false) }
-    var whereOpen by remember { mutableStateOf(false) }
+    // Saveable, so a dialog that was open is still open after the phone turns sideways and
+    // the window is built again.
+    var settingsOpen by rememberSaveable { mutableStateOf(false) }
+    var whenOpen by rememberSaveable { mutableStateOf(false) }
+    var whereOpen by rememberSaveable { mutableStateOf(false) }
     // Set when the GPS was asked and had nothing cached. Cleared whenever the dialog is
     // opened again, so a message from last time is never the first thing read.
-    var noFix by remember { mutableStateOf(false) }
+    var noFix by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.load() }
+
+    val sensor = remember { PointSensor(context.applicationContext) }
+    val pointing = state.pointing
+    // The sensors run only while Point is on, not held, and the app is in front: registered
+    // on resume (or when Point comes on), unregistered on pause (or when it goes off).
+    if (pointing != null && !pointing.held) {
+        LifecycleResumeEffect(sensor) {
+            sensor.start(
+                displayRotation = context.display?.rotation ?: 0,
+                onAim = viewModel::onAim,
+                onUnsure = viewModel::setCompassUnsure,
+            )
+            onPauseOrDispose { sensor.stop() }
+        }
+    }
+
+    // Back leaves Point for the whole-sky chart where it was left, and Settings for the
+    // chart, before it leaves the app.
+    BackHandler(enabled = pointing != null && !settingsOpen) { viewModel.stopPoint() }
+    BackHandler(enabled = settingsOpen) { settingsOpen = false }
 
     val ask = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -92,12 +138,15 @@ private fun StarChart(viewModel: ChartViewModel = viewModel()) {
     when {
         settingsOpen -> SettingsScreen(
             layers = state.layers,
+            turnWithPhone = state.turnWithPhone,
             onClose = { settingsOpen = false },
             onLayers = viewModel::setLayers,
+            onTurnWithPhone = viewModel::setTurnWithPhone,
         )
 
         else -> ChartScreen(
             state = state,
+            canPoint = sensor.available,
             onSettings = { settingsOpen = true },
             onFacing = viewModel::nextFacing,
             onWhen = { whenOpen = true },
@@ -108,6 +157,8 @@ private fun StarChart(viewModel: ChartViewModel = viewModel()) {
             onZoom = viewModel::zoomBy,
             onPan = viewModel::panBy,
             onResetView = viewModel::resetView,
+            onPoint = viewModel::togglePoint,
+            onHold = viewModel::toggleHold,
         )
     }
 

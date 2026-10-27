@@ -20,6 +20,15 @@ class Preferences(context: Context) {
         get() = store.getInt(FACING, 0)
         set(value) = store.edit().putInt(FACING, value).apply()
 
+    /**
+     * Whether the app turns sideways when the phone does. On by default: the Kompakt's own
+     * settings have no auto-rotate switch, so following the phone's setting alone would leave
+     * landscape out of reach.
+     */
+    var turnWithPhone: Boolean
+        get() = store.getBoolean(TURN_WITH_PHONE, true)
+        set(value) = store.edit().putBoolean(TURN_WITH_PHONE, value).apply()
+
     var layers: Layers
         get() = Layers(
             constellationLines = store.getBoolean(CONST_LINES, true),
@@ -73,6 +82,7 @@ class Preferences(context: Context) {
         const val LAT = "lat"
         const val LON = "lon"
         const val FACING = "facing"
+        const val TURN_WITH_PHONE = "turnWithPhone"
         const val CONST_LINES = "constLines"
         const val CONST_NAMES = "constNames"
         const val CONST_BOUNDS = "constBounds"

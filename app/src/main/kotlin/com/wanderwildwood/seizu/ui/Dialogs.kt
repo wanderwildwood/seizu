@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +25,9 @@ import com.wanderwildwood.seizu.sky.steppedTime
 import com.wanderwildwood.seizu.sky.SkyStar
 import java.util.GregorianCalendar
 import android.content.Intent
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.platform.LocalConfiguration
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -57,63 +60,63 @@ fun LocationDialog(
     onUseGps: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var lat by remember { mutableStateOf(latitude.toString()) }
-    var lon by remember { mutableStateOf(longitude.toString()) }
-    var bad by remember { mutableStateOf(false) }
+    var lat by rememberSaveable { mutableStateOf(latitude.toString()) }
+    var lon by rememberSaveable { mutableStateOf(longitude.toString()) }
+    var bad by rememberSaveable { mutableStateOf(false) }
 
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(text = stringResource(R.string.where_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
+        TwoSides(first = {
+            TextMMD(text = stringResource(R.string.where_latitude), style = MaterialTheme.typography.labelSmall)
+            TextFieldMMD(value = lat, onValueChange = { lat = it; bad = false })
+            Spacer(Modifier.height(10.dp))
+            TextMMD(text = stringResource(R.string.where_longitude), style = MaterialTheme.typography.labelSmall)
+            TextFieldMMD(value = lon, onValueChange = { lon = it; bad = false })
 
-        TextMMD(text = stringResource(R.string.where_latitude), style = MaterialTheme.typography.labelSmall)
-        TextFieldMMD(value = lat, onValueChange = { lat = it; bad = false })
-        Spacer(Modifier.height(10.dp))
-        TextMMD(text = stringResource(R.string.where_longitude), style = MaterialTheme.typography.labelSmall)
-        TextFieldMMD(value = lon, onValueChange = { lon = it; bad = false })
-
-        if (bad) {
-            Spacer(Modifier.height(8.dp))
-            TextMMD(
-                text = stringResource(R.string.where_out_of_range),
-                style = MaterialTheme.typography.labelSmall,
-            )
-        }
-
-        Spacer(Modifier.height(14.dp))
-        OutlinedButtonMMD(
-            onClick = {
-                val la = lat.trim().toDoubleOrNull()
-                val lo = lon.trim().toDoubleOrNull()
-                if (la == null || lo == null || la < -90 || la > 90 || lo < -180 || lo > 180) {
-                    bad = true
-                } else {
-                    onSet(la, lo)
-                }
-            },
-            modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = stringResource(R.string.where_use_this), style = MaterialTheme.typography.bodySmall) }
-
-        if (canUseGps) {
-            Spacer(Modifier.height(8.dp))
-            OutlinedButtonMMD(
-                onClick = onUseGps,
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-            ) { TextMMD(text = stringResource(R.string.where_ask_gps), style = MaterialTheme.typography.bodySmall) }
-
-            if (noFix) {
+            if (bad) {
                 Spacer(Modifier.height(8.dp))
                 TextMMD(
-                    text = stringResource(R.string.where_no_fix),
+                    text = stringResource(R.string.where_out_of_range),
                     style = MaterialTheme.typography.labelSmall,
                 )
             }
-        }
+        }, second = {
+            OutlinedButtonMMD(
+                onClick = {
+                    val la = lat.trim().toDoubleOrNull()
+                    val lo = lon.trim().toDoubleOrNull()
+                    if (la == null || lo == null || la < -90 || la > 90 || lo < -180 || lo > 180) {
+                        bad = true
+                    } else {
+                        onSet(la, lo)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+            ) { TextMMD(text = stringResource(R.string.where_use_this), style = MaterialTheme.typography.bodySmall) }
 
-        Spacer(Modifier.height(8.dp))
-        OutlinedButtonMMD(
-            onClick = onDismiss,
-            modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = stringResource(R.string.where_cancel), style = MaterialTheme.typography.bodySmall) }
+            if (canUseGps) {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButtonMMD(
+                    onClick = onUseGps,
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                ) { TextMMD(text = stringResource(R.string.where_ask_gps), style = MaterialTheme.typography.bodySmall) }
+
+                if (noFix) {
+                    Spacer(Modifier.height(8.dp))
+                    TextMMD(
+                        text = stringResource(R.string.where_no_fix),
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+            OutlinedButtonMMD(
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+            ) { TextMMD(text = stringResource(R.string.where_cancel), style = MaterialTheme.typography.bodySmall) }
+        })
     }
 }
 
@@ -131,12 +134,12 @@ fun TimeDialog(
     onDismiss: () -> Unit,
 ) {
     val start = current ?: GregorianCalendar()
-    var year by remember { mutableStateOf(start.get(java.util.Calendar.YEAR).toString()) }
-    var month by remember { mutableStateOf((start.get(java.util.Calendar.MONTH) + 1).toString()) }
-    var day by remember { mutableStateOf(start.get(java.util.Calendar.DAY_OF_MONTH).toString()) }
-    var hour by remember { mutableStateOf(start.get(java.util.Calendar.HOUR_OF_DAY).toString()) }
-    var minute by remember { mutableStateOf(start.get(java.util.Calendar.MINUTE).toString()) }
-    var bad by remember { mutableStateOf(false) }
+    var year by rememberSaveable { mutableStateOf(start.get(java.util.Calendar.YEAR).toString()) }
+    var month by rememberSaveable { mutableStateOf((start.get(java.util.Calendar.MONTH) + 1).toString()) }
+    var day by rememberSaveable { mutableStateOf(start.get(java.util.Calendar.DAY_OF_MONTH).toString()) }
+    var hour by rememberSaveable { mutableStateOf(start.get(java.util.Calendar.HOUR_OF_DAY).toString()) }
+    var minute by rememberSaveable { mutableStateOf(start.get(java.util.Calendar.MINUTE).toString()) }
+    var bad by rememberSaveable { mutableStateOf(false) }
 
     // Stepping writes back into the same five fields, so the buttons and the typing are
     // the one answer rather than two ways in. Nothing is charted until "Chart this
@@ -161,71 +164,71 @@ fun TimeDialog(
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(text = stringResource(R.string.when_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
-
-        // Three fields on the line their label already describes, rather than stacked: a
-        // date is one fact, and stacked it took two thirds of the dialog's height for it.
-        TextMMD(text = stringResource(R.string.when_date), style = MaterialTheme.typography.labelSmall)
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TextFieldMMD(value = year, onValueChange = { year = it; bad = false }, modifier = Modifier.weight(1.4f))
-            Spacer(Modifier.width(6.dp))
-            TextFieldMMD(value = month, onValueChange = { month = it; bad = false }, modifier = Modifier.weight(1f))
-            Spacer(Modifier.width(6.dp))
-            TextFieldMMD(value = day, onValueChange = { day = it; bad = false }, modifier = Modifier.weight(1f))
-        }
-        Spacer(Modifier.height(8.dp))
-        TextMMD(text = stringResource(R.string.when_time), style = MaterialTheme.typography.labelSmall)
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TextFieldMMD(value = hour, onValueChange = { hour = it; bad = false }, modifier = Modifier.weight(1f))
-            Spacer(Modifier.width(6.dp))
-            TextFieldMMD(value = minute, onValueChange = { minute = it; bad = false }, modifier = Modifier.weight(1f))
-        }
-
-        if (bad) {
+        TwoSides(first = {
+            // Three fields on the line their label already describes, rather than stacked: a
+            // date is one fact, and stacked it took two thirds of the dialog's height for it.
+            TextMMD(text = stringResource(R.string.when_date), style = MaterialTheme.typography.labelSmall)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                TextFieldMMD(value = year, onValueChange = { year = it; bad = false }, modifier = Modifier.weight(1.4f))
+                Spacer(Modifier.width(6.dp))
+                TextFieldMMD(value = month, onValueChange = { month = it; bad = false }, modifier = Modifier.weight(1f))
+                Spacer(Modifier.width(6.dp))
+                TextFieldMMD(value = day, onValueChange = { day = it; bad = false }, modifier = Modifier.weight(1f))
+            }
             Spacer(Modifier.height(8.dp))
-            TextMMD(text = stringResource(R.string.when_bad_date), style = MaterialTheme.typography.labelSmall)
-        }
+            TextMMD(text = stringResource(R.string.when_time), style = MaterialTheme.typography.labelSmall)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                TextFieldMMD(value = hour, onValueChange = { hour = it; bad = false }, modifier = Modifier.weight(1f))
+                Spacer(Modifier.width(6.dp))
+                TextFieldMMD(value = minute, onValueChange = { minute = it; bad = false }, modifier = Modifier.weight(1f))
+            }
 
-        Spacer(Modifier.height(12.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
-            StepButton(stringResource(R.string.when_step_back_day), Modifier.weight(1f)) { step(0, -1) }
-            Spacer(Modifier.width(6.dp))
-            StepButton(stringResource(R.string.when_step_back_hour), Modifier.weight(1f)) { step(-1, 0) }
-            Spacer(Modifier.width(6.dp))
-            StepButton(stringResource(R.string.when_step_forward_hour), Modifier.weight(1f)) { step(1, 0) }
-            Spacer(Modifier.width(6.dp))
-            StepButton(stringResource(R.string.when_step_forward_day), Modifier.weight(1f)) { step(0, 1) }
-        }
+            if (bad) {
+                Spacer(Modifier.height(8.dp))
+                TextMMD(text = stringResource(R.string.when_bad_date), style = MaterialTheme.typography.labelSmall)
+            }
+        }, second = {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                StepButton(stringResource(R.string.when_step_back_day), Modifier.weight(1f)) { step(0, -1) }
+                Spacer(Modifier.width(6.dp))
+                StepButton(stringResource(R.string.when_step_back_hour), Modifier.weight(1f)) { step(-1, 0) }
+                Spacer(Modifier.width(6.dp))
+                StepButton(stringResource(R.string.when_step_forward_hour), Modifier.weight(1f)) { step(1, 0) }
+                Spacer(Modifier.width(6.dp))
+                StepButton(stringResource(R.string.when_step_forward_day), Modifier.weight(1f)) { step(0, 1) }
+            }
 
-        Spacer(Modifier.height(12.dp))
-        OutlinedButtonMMD(
-            onClick = {
-                val y = year.trim().toIntOrNull()
-                val mo = month.trim().toIntOrNull()
-                val d = day.trim().toIntOrNull()
-                val h = hour.trim().toIntOrNull()
-                val mi = minute.trim().toIntOrNull()
-                if (y == null || mo == null || d == null || h == null || mi == null ||
-                    mo !in 1..12 || d !in 1..31 || h !in 0..23 || mi !in 0..59
-                ) {
-                    bad = true
-                } else {
-                    onSet(GregorianCalendar(y, mo - 1, d, h, mi))
-                }
-            },
-            modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = stringResource(R.string.when_chart_this_moment), style = MaterialTheme.typography.bodySmall) }
+            Spacer(Modifier.height(12.dp))
+            OutlinedButtonMMD(
+                onClick = {
+                    val y = year.trim().toIntOrNull()
+                    val mo = month.trim().toIntOrNull()
+                    val d = day.trim().toIntOrNull()
+                    val h = hour.trim().toIntOrNull()
+                    val mi = minute.trim().toIntOrNull()
+                    if (y == null || mo == null || d == null || h == null || mi == null ||
+                        mo !in 1..12 || d !in 1..31 || h !in 0..23 || mi !in 0..59
+                    ) {
+                        bad = true
+                    } else {
+                        onSet(GregorianCalendar(y, mo - 1, d, h, mi))
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+            ) { TextMMD(text = stringResource(R.string.when_chart_this_moment), style = MaterialTheme.typography.bodySmall) }
 
-        Spacer(Modifier.height(8.dp))
-        OutlinedButtonMMD(
-            onClick = { onSet(null) },
-            modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = stringResource(R.string.when_back_to_now), style = MaterialTheme.typography.bodySmall) }
+            Spacer(Modifier.height(8.dp))
+            OutlinedButtonMMD(
+                onClick = { onSet(null) },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+            ) { TextMMD(text = stringResource(R.string.when_back_to_now), style = MaterialTheme.typography.bodySmall) }
 
-        Spacer(Modifier.height(8.dp))
-        OutlinedButtonMMD(
-            onClick = onDismiss,
-            modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = stringResource(R.string.when_cancel), style = MaterialTheme.typography.bodySmall) }
+            Spacer(Modifier.height(8.dp))
+            OutlinedButtonMMD(
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+            ) { TextMMD(text = stringResource(R.string.when_cancel), style = MaterialTheme.typography.bodySmall) }
+        })
     }
 }
 
@@ -392,6 +395,27 @@ private fun Llama() {
             )
             Spacer(Modifier.width(6.dp))
             TextMMD(text = stringResource(R.string.about_feed_the_llamas), style = MaterialTheme.typography.labelSmall)
+        }
+    }
+}
+
+/**
+ * A dialog's fields and its buttons: one above the other, or side by side when the phone is
+ * on its side and the panel is too short to stack them.
+ */
+@Composable
+private fun TwoSides(first: @Composable () -> Unit, second: @Composable () -> Unit) {
+    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.weight(1f)) { first() }
+            Spacer(Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) { second() }
+        }
+    } else {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            first()
+            Spacer(Modifier.height(12.dp))
+            second()
         }
     }
 }

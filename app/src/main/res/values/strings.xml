@@ -48,6 +48,24 @@
     <!-- The same button when zoomed in. %1$s is one of the four above, %2$.1f the zoom (×2.5 means two and a half times). Keep the two spaces, and the quotes that keep them -->
     <string name="chart_facing_zoomed">"%1$s  ×%2$.1f"</string>
 
+    <!-- Point: the chart follows the way the phone's back points at the sky -->
+    <!-- Button beside the facing button that turns Point on (verb: point the phone) -->
+    <string name="point_point">Point</string>
+    <!-- The same button while Point is on: back to the whole-sky chart -->
+    <string name="point_whole_sky">Whole sky</string>
+    <!-- While Point is on, the facing button freezes the view (verb) -->
+    <string name="point_hold">Hold</string>
+    <!-- The same button while the view is held: follow the phone again (verb) -->
+    <string name="point_follow">Follow</string>
+    <!-- Under the chart before the phone has first come to rest -->
+    <string name="point_waiting">Hold the phone up to the sky</string>
+    <!-- Under the chart when no named star or planet is near the cross in the middle -->
+    <string name="point_nothing_named">Nothing named near the cross</string>
+    <!-- The star under the cross and its constellation, e.g. "Vega, in Lyra". %1$s is the star, %2$s the constellation -->
+    <string name="point_star_in">%1$s, in %2$s</string>
+    <!-- Shown when the phone says its compass reading is poor -->
+    <string name="point_compass_unsure">Compass unsure — move the phone in a figure 8</string>
+
     <!-- Names beside the Sun, the Moon and the planets on the chart, and over their details when tapped -->
     <string name="body_sun">Sun</string>
     <string name="body_moon">Moon</string>
@@ -179,6 +197,8 @@
     <string name="settings_equator">Celestial equator</string>
     <string name="settings_grid">Declination grid</string>
     <string name="settings_altitude_circles">Altitude circles</string>
+    <!-- Whether the app turns to landscape when the phone is turned on its side -->
+    <string name="settings_turn">Turn sideways with the phone</string>
     <!-- A toggle row's value: the layer is shown / hidden -->
     <string name="settings_on">On</string>
     <string name="settings_off">Off</string>
