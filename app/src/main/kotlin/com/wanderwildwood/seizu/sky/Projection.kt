@@ -52,7 +52,9 @@ data class Projection(
      * the horizon impossible to draw at all.
      */
     fun project(azimuth: Double, elevation: Double): Pair<Float, Float> {
-        val radians = Math.toRadians(azimuth + facing)
+        // Minus, so the bearing named by [facing] is the one at the bottom. With a plus,
+        // north and south were right and east and west each put the other at the bottom.
+        val radians = Math.toRadians(azimuth - facing)
         val distance = distanceFor(elevation)
         val x = zenithX + sin(radians) * distance
         val y = zenithY + cos(radians) * distance

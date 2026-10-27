@@ -83,6 +83,25 @@ class ProjectionTest {
         assertTrue("with south up, north goes to the top", y < turned.centreY)
     }
 
+    /** Every one of the four facings puts its own bearing at the bottom, not only N and S. */
+    @Test
+    fun `each facing puts its own bearing at the bottom`() {
+        listOf(0, 90, 180, 270).forEach { facing ->
+            val turned = projection.copy(facing = facing)
+            val (x, y) = turned.project(facing.toDouble(), 0.0)
+            assertEquals("facing $facing x", 200f, x, 1e-3f)
+            assertEquals("facing $facing y", 400f, y, 1e-3f)
+        }
+    }
+
+    /** Facing east and looking up, north is on your left. */
+    @Test
+    fun `facing east puts north on the left`() {
+        val turned = projection.copy(facing = 90)
+        val (x, _) = turned.project(0.0, 0.0)
+        assertTrue("north should be left of centre", x < turned.centreX)
+    }
+
     /**
      * Panning moves the whole drawing under the window, zenith included.
      *
