@@ -252,14 +252,14 @@ private class Label(
 private val MARK_BASE = 1.25.dp
 
 /** White space left round the disc for the four letters of the compass. */
-private val CHART_INSET = 16.dp
+private val CHART_INSET = 20.dp
 
 private val LABEL_GAP = 2.5.dp
 
-private const val CARDINAL_TEXT = 12f
-private const val BODY_TEXT = 10f
-private const val CONSTELLATION_TEXT = 10f
-private const val STAR_TEXT = 8.5f
+private const val CARDINAL_TEXT = 14f
+private const val BODY_TEXT = 14f
+private const val CONSTELLATION_TEXT = 14f
+private const val STAR_TEXT = 14f
 
 /** How far outside the rim the compass letters sit, in degrees below the horizon. */
 private const val CARDINAL_DROP = -3.0
