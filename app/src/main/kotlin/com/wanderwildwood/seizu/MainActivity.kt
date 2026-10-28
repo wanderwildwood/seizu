@@ -3,7 +3,6 @@ package com.wanderwildwood.seizu
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
@@ -38,6 +37,18 @@ import com.wanderwildwood.seizu.ui.TimeDialog
 import com.wanderwildwood.seizu.ui.monochrome
 
 class MainActivity : ComponentActivity() {
+    private val turner = TurnWithPhone(this)
+
+    override fun onResume() {
+        super.onResume()
+        turner.resume()
+    }
+
+    override fun onPause() {
+        turner.pause()
+        super.onPause()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -58,7 +69,7 @@ class MainActivity : ComponentActivity() {
             val viewModel: ChartViewModel = viewModel()
             val state by viewModel.state.collectAsStateWithLifecycle()
             val pointing = state.pointing != null
-            LaunchedEffect(state.turnWithPhone, pointing) { turnWithPhone(state.turnWithPhone, pointing) }
+            LaunchedEffect(state.turnWithPhone, pointing) { turner.set(state.turnWithPhone, held = pointing) }
             // A steady cursor: a blinking one is a repaint twice a second on an E Ink panel
             // for as long as a field has focus.
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
@@ -66,22 +77,6 @@ class MainActivity : ComponentActivity() {
                     StarChart(viewModel)
                 }
             }
-        }
-    }
-
-    /**
-     * Sideways with the phone by the sensor itself when the setting is on, since the Kompakt
-     * gives no way to switch its own auto-rotate on; otherwise as the phone's setting says.
-     *
-     * While Point is on the window stays whichever way it was when Point was pressed. Tipping
-     * a phone back towards the zenith is exactly the movement that makes Android's own
-     * rotation guess flip the screen, and a flip would redraw the whole panel mid-look.
-     */
-    private fun turnWithPhone(on: Boolean, pointing: Boolean) {
-        requestedOrientation = when {
-            pointing -> ActivityInfo.SCREEN_ORIENTATION_LOCKED
-            on -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
-            else -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }
 }
