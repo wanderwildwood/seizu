@@ -94,8 +94,14 @@ private fun StarChart(viewModel: ChartViewModel) {
     // Set when the GPS was asked and had nothing cached. Cleared whenever the dialog is
     // opened again, so a message from last time is never the first thing read.
     var noFix by rememberSaveable { mutableStateOf(false) }
+    // Location refused for good: the dialog stays and says where to give it back.
+    var locationDenied by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { viewModel.load() }
+    // The chart starts at Greenwich, which is nobody's hillside: on the first run, ask where.
+    LaunchedEffect(Unit) {
+        viewModel.load()
+        if (!viewModel.placeSaved) whereOpen = true
+    }
 
     val sensor = remember { PointSensor(context.applicationContext) }
     val pointing = state.pointing
@@ -121,9 +127,12 @@ private fun StarChart(viewModel: ChartViewModel) {
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
         if (!granted) {
-            whereOpen = false
+            // Stay in the dialog and say so: the place can still be typed, and a permission
+            // refused for good can be given back in the app's settings.
+            locationDenied = true
             return@rememberLauncherForActivityResult
         }
+        locationDenied = false
         // Permission is not a fix. Granting it and still having nothing cached is the
         // ordinary case on a phone that has been indoors, so say so and leave the dialog
         // up rather than closing it on a chart that did not move.
@@ -151,7 +160,7 @@ private fun StarChart(viewModel: ChartViewModel) {
             onSettings = { settingsOpen = true },
             onFacing = viewModel::nextFacing,
             onWhen = { whenOpen = true },
-            onWhere = { noFix = false; whereOpen = true },
+            onWhere = { noFix = false; locationDenied = false; whereOpen = true },
             onSelect = viewModel::select,
             onZoomIn = { viewModel.zoomBy(ZOOM_STEP) },
             onZoomOut = { viewModel.zoomBy(1f / ZOOM_STEP) },
@@ -177,10 +186,12 @@ private fun StarChart(viewModel: ChartViewModel) {
             longitude = state.longitude,
             canUseGps = true,
             noFix = noFix,
+            denied = locationDenied,
+            onOpenSettings = { openAppSettings(context) },
             onSet = { la, lo -> viewModel.setLocation(la, lo); whereOpen = false },
             onUseGps = {
                 if (!hasLocation(context)) {
-                    ask.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    if (locationDenied) openAppSettings(context) else ask.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
                 } else {
                     val fix = lastKnownLocation(context)
                     if (fix == null) {
@@ -222,4 +233,16 @@ private fun lastKnownLocation(context: Context): Pair<Double, Double>? {
         if (fix != null) return fix.latitude to fix.longitude
     }
     return null
+}
+
+/** Opens this app's own page in Android's settings, where a permission refused for good can be given. */
+private fun openAppSettings(context: Context) {
+    runCatching {
+        context.startActivity(
+            android.content.Intent(
+                android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                android.net.Uri.parse("package:${context.packageName}"),
+            ).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+    }
 }

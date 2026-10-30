@@ -302,8 +302,14 @@ private fun facingName(bearing: Int): Int = when (bearing) {
 /** The moment a chart is drawn for, as a date and a time on this phone's clock. */
 @Composable
 private fun whenText(moment: Date): String {
-    val pattern = stringResource(R.string.chart_when_pattern)
-    val format = remember(pattern) { SimpleDateFormat(pattern, Locale.getDefault()) }
+    // The phone's own order and clock: 12 or 24 hour as chosen in Android's settings.
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val format = remember(configuration) {
+        val locale = Locale.getDefault()
+        val skeleton = if (android.text.format.DateFormat.is24HourFormat(context)) "dMMMyyyyHm" else "dMMMyyyyhm"
+        SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(locale, skeleton), locale)
+    }
     return format.format(moment)
 }
 

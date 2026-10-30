@@ -99,6 +99,9 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /** False on a first run: no place has been chosen yet. */
+    val placeSaved: Boolean get() = preferences.placeSaved
+
     fun setLocation(latitude: Double, longitude: Double, fromGps: Boolean = false) {
         preferences.latitude = latitude
         preferences.longitude = longitude

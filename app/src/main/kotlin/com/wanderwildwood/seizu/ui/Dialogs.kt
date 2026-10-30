@@ -18,6 +18,7 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.wanderwildwood.seizu.BuildConfig
 import com.wanderwildwood.seizu.sky.BodyKind
+import com.wanderwildwood.seizu.sky.TimeEntry
 import com.wanderwildwood.seizu.sky.SkyBody
 import com.wanderwildwood.seizu.sky.SkyObject
 import com.wanderwildwood.seizu.sky.phaseName
@@ -65,6 +66,9 @@ fun LocationDialog(
     canUseGps: Boolean,
     /** The GPS was asked and had nothing to give. Said out loud, or the button reads as broken. */
     noFix: Boolean,
+    /** Location was refused. Said with the way back, never by silently closing. */
+    denied: Boolean,
+    onOpenSettings: () -> Unit,
     onSet: (Double, Double) -> Unit,
     onUseGps: () -> Unit,
     onDismiss: () -> Unit,
@@ -128,6 +132,18 @@ fun LocationDialog(
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                 ) { TextMMD(text = stringResource(R.string.where_ask_gps), style = MaterialTheme.typography.bodySmall) }
 
+                if (denied) {
+                    Spacer(Modifier.height(8.dp))
+                    TextMMD(
+                        text = stringResource(R.string.where_denied),
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                    OutlinedButtonMMD(
+                        onClick = onOpenSettings,
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                    ) { TextMMD(text = stringResource(R.string.open_app_settings), style = MaterialTheme.typography.bodySmall) }
+                }
+
                 if (noFix) {
                     Spacer(Modifier.height(8.dp))
                     TextMMD(
@@ -163,7 +179,16 @@ fun TimeDialog(
     var year by rememberSaveable { mutableStateOf(start.get(java.util.Calendar.YEAR).toString()) }
     var month by rememberSaveable { mutableStateOf((start.get(java.util.Calendar.MONTH) + 1).toString()) }
     var day by rememberSaveable { mutableStateOf(start.get(java.util.Calendar.DAY_OF_MONTH).toString()) }
-    var hour by rememberSaveable { mutableStateOf(start.get(java.util.Calendar.HOUR_OF_DAY).toString()) }
+    // The phone's own clock: on a 12 hour phone the hour is typed 1 to 12 with an AM / PM button.
+    val is24 = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
+    val startHour = start.get(java.util.Calendar.HOUR_OF_DAY)
+    var hour by rememberSaveable { mutableStateOf((if (is24) startHour else TimeEntry.from24(startHour).first).toString()) }
+    var pm by rememberSaveable { mutableStateOf(startHour >= 12) }
+    /** The hour field as 0..23, or null when it is not a valid hour for this clock. */
+    fun hour24(): Int? {
+        val h = hour.trim().toIntOrNull() ?: return null
+        return if (is24) h.takeIf { it in 0..23 } else h.takeIf { it in 1..12 }?.let { TimeEntry.to24(it, pm) }
+    }
     var minute by rememberSaveable { mutableStateOf(start.get(java.util.Calendar.MINUTE).toString()) }
     var bad by rememberSaveable { mutableStateOf(false) }
 
@@ -175,14 +200,16 @@ fun TimeDialog(
             year.trim().toIntOrNull() ?: start.get(java.util.Calendar.YEAR),
             (month.trim().toIntOrNull() ?: (start.get(java.util.Calendar.MONTH) + 1)) - 1,
             day.trim().toIntOrNull() ?: start.get(java.util.Calendar.DAY_OF_MONTH),
-            hour.trim().toIntOrNull() ?: start.get(java.util.Calendar.HOUR_OF_DAY),
+            hour24() ?: start.get(java.util.Calendar.HOUR_OF_DAY),
             minute.trim().toIntOrNull() ?: start.get(java.util.Calendar.MINUTE),
         )
         val next = steppedTime(from, hours, days)
         year = next.get(java.util.Calendar.YEAR).toString()
         month = (next.get(java.util.Calendar.MONTH) + 1).toString()
         day = next.get(java.util.Calendar.DAY_OF_MONTH).toString()
-        hour = next.get(java.util.Calendar.HOUR_OF_DAY).toString()
+        val nextHour = next.get(java.util.Calendar.HOUR_OF_DAY)
+        hour = (if (is24) nextHour else TimeEntry.from24(nextHour).first).toString()
+        pm = nextHour >= 12
         minute = next.get(java.util.Calendar.MINUTE).toString()
         bad = false
     }
@@ -207,6 +234,13 @@ fun TimeDialog(
                 NumberField(value = hour, onValue = { hour = it; bad = false }, modifier = Modifier.weight(1f))
                 Spacer(Modifier.width(6.dp))
                 NumberField(value = minute, onValue = { minute = it; bad = false }, modifier = Modifier.weight(1f))
+                if (!is24) {
+                    Spacer(Modifier.width(6.dp))
+                    StepButton(
+                        stringResource(if (pm) R.string.when_pm else R.string.when_am),
+                        Modifier.weight(1f),
+                    ) { pm = !pm; bad = false }
+                }
             }
 
             if (bad) {
@@ -230,10 +264,10 @@ fun TimeDialog(
                     val y = year.trim().toIntOrNull()
                     val mo = month.trim().toIntOrNull()
                     val d = day.trim().toIntOrNull()
-                    val h = hour.trim().toIntOrNull()
+                    val h = hour24()
                     val mi = minute.trim().toIntOrNull()
                     if (y == null || mo == null || d == null || h == null || mi == null ||
-                        mo !in 1..12 || d !in 1..31 || h !in 0..23 || mi !in 0..59
+                        !TimeEntry.dateOk(y, mo, d) || mi !in 0..59
                     ) {
                         bad = true
                     } else {
@@ -327,7 +361,14 @@ private fun Line(label: String, value: String) {
  */
 @Composable
 fun AboutDialog(onDismiss: () -> Unit) {
-    EInkDialog(onDismiss = onDismiss) {
+    var licences by rememberSaveable { mutableStateOf(false) }
+    val room = androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp.dp * 0.62f
+    // Back in the Licences page returns to the About rather than leaving both.
+    EInkDialog(onDismiss = { if (licences) licences = false else onDismiss() }) {
+        if (licences) {
+            LicencesPage(onBack = { licences = false }, room = room)
+            return@EInkDialog
+        }
         PagedColumn(modifier = Modifier.weight(1f, fill = false)) {
             item {
                 Column {
@@ -346,6 +387,26 @@ fun AboutDialog(onDismiss: () -> Unit) {
             item { Section(stringResource(R.string.about_privacy_heading), stringResource(R.string.about_privacy_body)) }
             item { Section(stringResource(R.string.about_terms_heading), stringResource(R.string.about_terms_body)) }
             item { Paragraph(stringResource(R.string.about_icons)) }
+            item {
+                val context = LocalContext.current
+                Column {
+                    TextMMD(
+                        text = stringResource(R.string.about_licences),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth().clickable { licences = true }.heightIn(min = 48.dp).wrapContentHeight(Alignment.CenterVertically),
+                    )
+                    TextMMD(
+                        text = SOURCE_URL.removePrefix("https://"),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { openLink(context, SOURCE_URL, context.getString(R.string.about_no_browser_address, SOURCE_URL.removePrefix("https://"))) }
+                            .heightIn(min = 48.dp)
+                            .wrapContentHeight(Alignment.CenterVertically),
+                    )
+                }
+            }
             item { Llama() }
         }
 
@@ -405,13 +466,7 @@ private fun Llama() {
             // The site's address opens the site, the way the llama beside it opens its page.
             modifier = Modifier
                 .clickable {
-                    runCatching {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse("https://wanderthe.dev")),
-                        )
-                    }.onFailure {
-                        Toast.makeText(context, context.getString(R.string.about_no_browser), Toast.LENGTH_SHORT).show()
-                    }
+                    openLink(context, "https://wanderthe.dev", context.getString(R.string.about_no_browser_address, "wanderthe.dev"))
                 }
                 .heightIn(min = 48.dp)
                 .wrapContentHeight(Alignment.CenterVertically),
@@ -426,13 +481,7 @@ private fun Llama() {
                     // The short square.link form, not the long checkout.square.site address it
                     // redirects to -- the short one is what the site itself links to, so a
                     // regenerated checkout follows it and a published app does not break.
-                    runCatching {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse("https://square.link/u/AGu8oT10")),
-                        )
-                    }.onFailure {
-                        Toast.makeText(context, context.getString(R.string.about_no_browser), Toast.LENGTH_SHORT).show()
-                    }
+                    openLink(context, "https://square.link/u/AGu8oT10", context.getString(R.string.about_no_browser_address, "square.link/u/AGu8oT10"))
                 }
                 .heightIn(min = 48.dp),
         ) {

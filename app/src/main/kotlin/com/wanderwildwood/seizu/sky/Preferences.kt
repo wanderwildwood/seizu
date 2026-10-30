@@ -16,6 +16,9 @@ class Preferences(context: Context) {
         get() = Double.fromBits(store.getLong(LON, DEFAULT_LON.toRawBits()))
         set(value) = store.edit().putLong(LON, value.toRawBits()).apply()
 
+    /** Whether a place was ever chosen. Until then the chart is drawn for Greenwich, and says so by asking. */
+    val placeSaved: Boolean get() = store.contains(LAT) && store.contains(LON)
+
     var facing: Int
         get() = store.getInt(FACING, 0)
         set(value) = store.edit().putInt(FACING, value).apply()

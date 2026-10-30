@@ -26,7 +26,6 @@
     <!-- Qualifier: the place was typed in -->
     <string name="chart_where_sub_by_hand">by hand</string>
     <!-- The when field's value: the date and time the chart is drawn for. A java.text.SimpleDateFormat pattern, not text: d day, MMM short month name, yyyy year, HH:mm 24-hour time. Reorder the fields for your language; the month name is put in by the phone -->
-    <string name="chart_when_pattern">d MMM yyyy, HH:mm</string>
     <!-- The where field's value. %1$.2f is the latitude and %3$.2f the longitude, both without a sign; %2$s and %4$s are the compass letters below that say which side of the equator and of Greenwich -->
     <string name="chart_where_value">%1$.2f°%2$s %3$.2f°%4$s</string>
 
@@ -90,7 +89,9 @@
     <string name="where_out_of_range">Latitude runs 0 to 90, longitude 0 to 180.</string>
     <!-- Button: chart from the typed place -->
     <string name="where_use_this">Use this</string>
-    <string name="where_ask_gps">Ask the GPS</string>
+    <string name="where_ask_gps">Use last known place</string>
+    <string name="where_denied">Location is off for Star Chart. Type your place above, or allow it in the app\'s settings.</string>
+    <string name="open_app_settings">Open app settings</string>
     <string name="where_no_fix">The phone has no recent fix. Step outside and try again, or set it by hand — a chart is not fussy about a mile.</string>
     <string name="where_cancel">Cancel</string>
 
@@ -102,7 +103,9 @@
     <string name="when_date">Year, month, day</string>
     <!-- Label above two fields: hour and minute, in the phone's time zone -->
     <string name="when_time">Hour and minute, on this phone\'s clock</string>
-    <string name="when_bad_date">That is not a date this can chart.</string>
+    <string name="when_am">AM</string>
+    <string name="when_pm">PM</string>
+    <string name="when_bad_date">That is not a date this can chart. Use a day that month has, in the years 1979 to 2050.</string>
     <!-- Four small step buttons: back a day, back an hour, forward an hour, forward a day. Keep them short; the minus is U+2212 -->
     <string name="when_step_back_day">− day</string>
     <string name="when_step_back_hour">− hr</string>
@@ -207,7 +210,7 @@
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Star Chart %1$s</string>
     <string name="about_black_on_white">Black on white, like a paper chart. A screen full of black would be unreadable outdoors and slow to redraw here.</string>
-    <string name="about_catalogue">Stars from the Yale Bright Star Catalogue. Every position is computed on the phone.</string>
+    <string name="about_catalogue">Stars from the Yale Bright Star Catalogue. Every position is computed on the phone; the outer planets come from JPL Horizons tables for 1979 to 2050.</string>
     <!-- Heading above the privacy paragraph -->
     <string name="about_privacy_heading">Privacy</string>
     <!-- "Ask the GPS" and "Point" are the names of buttons in the app; keep them the same as there -->
@@ -229,4 +232,16 @@
     <string name="folio_page">Page %1$d of %2$d</string>
     <string name="folio_go">Go</string>
     <string name="folio_cancel">Cancel</string>
+    <string name="about_licences">Licences</string>
+    <string name="licences_title">Licences</string>
+    <string name="licences_source_head">Source code</string>
+    <string name="licences_licence_head">Licence</string>
+    <string name="licences_licence">Star Chart is free software under the GNU General Public License, version 3 only (GPL-3.0-only), copyright wander wildwood, for what is written here. The work it is built on keeps its own licence and its authors keep their copyright, as listed under Built with. The full text of each licence is at the end of this page.</string>
+    <string name="licences_built_head">Built with</string>
+    <string name="licences_back">Back</string>
+    <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
+    <string name="licences_gpl">GNU General Public License, version 3</string>
+    <string name="licences_apache">Apache License, version 2.0</string>
+    <string name="licences_mit">MIT License</string>
+    <string name="licences_ofl">SIL Open Font License, version 1.1</string>
 </resources>
