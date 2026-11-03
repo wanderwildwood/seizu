@@ -64,6 +64,8 @@ photograph something. High overhead, where that direction has no bearing to spea
 way the screen's top edge leans takes over. The compass and motion sensors are read only
 while Point is on and the app is in front, and when the phone says its compass is unsure,
 the chart says so: "Compass unsure — move the phone in a figure 8".
+The compass points to magnetic north, which can be fifteen degrees or more from true north;
+the bearing is corrected for the place the chart is set to.
 
 ## The projection
 

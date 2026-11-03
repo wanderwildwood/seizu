@@ -112,6 +112,8 @@ dependencies {
     implementation(libs.mmd)
 
     testImplementation(libs.junit)
+    // Only for the declination test: Android's GeomagneticField is real code under Robolectric.
+    testImplementation(libs.robolectric)
 }
 
 // The Licenses page lists what the build actually packs: this plugin walks each variant's runtime

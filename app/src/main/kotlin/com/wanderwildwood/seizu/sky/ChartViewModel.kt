@@ -69,6 +69,9 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
 
     private val settler = Settler()
 
+    /** Degrees east from magnetic to true north here; worked out when Point comes on. */
+    private var declination = 0.0
+
     /**
      * Parse the catalogues, then draw the sky.
      *
@@ -106,7 +109,15 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         preferences.latitude = latitude
         preferences.longitude = longitude
         _state.update { it.copy(latitude = latitude, longitude = longitude, usingGps = fromGps) }
+        refreshDeclination()
         rebuild()
+    }
+
+    private fun refreshDeclination() {
+        val s = _state.value
+        declination = runCatching {
+            magneticDeclination(s.latitude, s.longitude, System.currentTimeMillis())
+        }.getOrDefault(0.0)
     }
 
     fun setTime(time: GregorianCalendar?) {
@@ -139,6 +150,7 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
             stopPoint()
         } else {
             settler.reset()
+            refreshDeclination()
             _state.update { it.copy(pointing = Pointing()) }
         }
     }
@@ -159,7 +171,8 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     fun onAim(aim: Aim, atMillis: Long) {
         val pointing = _state.value.pointing ?: return
         if (pointing.held) return
-        val settled = settler.offer(aim, atMillis) ?: return
+        // The sensors' bearing is from magnetic north; the chart's is from true north.
+        val settled = settler.offer(trueAim(aim, declination), atMillis) ?: return
         _state.update { current ->
             current.pointing?.let { current.copy(pointing = it.copy(aim = settled)) } ?: current
         }
