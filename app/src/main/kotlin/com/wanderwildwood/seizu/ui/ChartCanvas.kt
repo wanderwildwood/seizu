@@ -256,10 +256,11 @@ private val CHART_INSET = 20.dp
 
 private val LABEL_GAP = 2.5.dp
 
-private const val CARDINAL_TEXT = 14f
-private const val BODY_TEXT = 14f
-private const val CONSTELLATION_TEXT = 14f
-private const val STAR_TEXT = 14f
+// Chart labels follow the house floor (16 sp, STYLE.md) like any other text.
+private const val CARDINAL_TEXT = HOUSE_TYPE_FLOOR_SP
+private const val BODY_TEXT = HOUSE_TYPE_FLOOR_SP
+private const val CONSTELLATION_TEXT = HOUSE_TYPE_FLOOR_SP
+private const val STAR_TEXT = HOUSE_TYPE_FLOOR_SP
 
 /** How far outside the rim the compass letters sit, in degrees below the horizon. */
 private const val CARDINAL_DROP = -3.0
