@@ -1,0 +1,8 @@
+{
+  "uniqueId": "androidplanisphere",
+  "name": "AndroidPlanisphere (the astronomy)",
+  "description": "The orbital and positional astronomy (Astro, Kepler, Planet, Catalog, ConstellationDb), kept in its own package and unchanged apart from widened visibility and one marked adaptation.",
+  "developers": [{ "name": "Timo Engel" }],
+  "website": "https://github.com/tengel/AndroidPlanisphere",
+  "licenses": ["GPL-3.0-or-later"]
+}

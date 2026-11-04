@@ -1,0 +1,8 @@
+{
+  "uniqueId": "androidplanisphere-data",
+  "name": "Constellation lines, boundaries, names and star names",
+  "description": "Data files carried over with AndroidPlanisphere (res/raw constellation_*, star_names.txt).",
+  "developers": [{ "name": "Timo Engel and the sources he credits" }],
+  "website": "https://github.com/tengel/AndroidPlanisphere",
+  "licenses": ["GPL-3.0-or-later"]
+}

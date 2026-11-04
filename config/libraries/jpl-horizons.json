@@ -1,0 +1,8 @@
+{
+  "uniqueId": "jpl-horizons",
+  "name": "JPL Horizons ephemeris tables, 1979 to 2050",
+  "description": "Positions of Jupiter, Saturn, Uranus and Neptune (res/raw/horizons_*.csv), generated with the Horizons system.",
+  "developers": [{ "name": "NASA Jet Propulsion Laboratory" }],
+  "website": "https://ssd.jpl.nasa.gov/horizons/",
+  "licenses": ["jpl-horizons-terms"]
+}

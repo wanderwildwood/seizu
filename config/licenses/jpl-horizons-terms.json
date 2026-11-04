@@ -1,0 +1,6 @@
+{
+  "hash": "jpl-horizons-terms",
+  "name": "Public data",
+  "url": "https://ssd.jpl.nasa.gov/horizons/",
+  "content": "The positions of Jupiter, Saturn, Uranus and Neptune for 1979 to 2050 are tables generated with the JPL Horizons on-line solar system data and ephemeris computation service of the Solar System Dynamics group, NASA Jet Propulsion Laboratory, California Institute of Technology (https://ssd.jpl.nasa.gov/horizons/).\n\nHorizons output is public data. Star Chart carries the tables as Horizons wrote them, header included, and credits NASA/JPL."
+}
