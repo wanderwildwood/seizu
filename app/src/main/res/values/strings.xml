@@ -10,7 +10,7 @@
     <!-- Cog button in the top bar, read aloud by a screen reader -->
     <string name="chart_cd_settings">Settings</string>
     <!-- Shown once, while the star catalogue loads on first start -->
-    <string name="chart_loading">Reading the catalogue…</string>
+    <string name="chart_loading">Reading the catalog…</string>
     <string name="chart_loading_note">Nine thousand stars. This happens once.</string>
 
     <!-- The when and where fields under the chart: a value, then a qualifier after a dot. %1$s is the value, %2$s the qualifier -->
@@ -126,7 +126,7 @@
     <!-- A star's Bayer or Flamsteed designation, e.g. Alpha Lyrae -->
     <string name="object_designation">Designation</string>
     <!-- The star's number in a catalogue (noun) -->
-    <string name="object_catalogue">Catalogue</string>
+    <string name="object_catalogue">Catalog</string>
     <!-- Astronomical brightness -->
     <string name="object_magnitude">Magnitude</string>
     <!-- What sort of body it is (noun) -->
@@ -210,7 +210,7 @@
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Star Chart %1$s</string>
     <string name="about_black_on_white">Black on white, like a paper chart. A screen full of black would be unreadable outdoors and slow to redraw here.</string>
-    <string name="about_catalogue">Stars from the Yale Bright Star Catalogue. Every position is computed on the phone; the outer planets come from JPL Horizons tables for 1979 to 2050.</string>
+    <string name="about_catalogue">Stars from the Yale Bright Star Catalog. Every position is computed on the phone; the outer planets come from JPL Horizons tables for 1979 to 2050.</string>
     <!-- Heading above the privacy paragraph -->
     <string name="about_privacy_heading">Privacy</string>
     <!-- "Ask the GPS" and "Point" are the names of buttons in the app; keep them the same as there -->
@@ -225,14 +225,14 @@
     <!-- Toast when the donation link cannot be opened -->
     <!-- Button that closes the About dialog -->
     <string name="about_close">Close</string>
-    <string name="licences_title">Licences</string>
+    <string name="licences_title">Licenses</string>
     <string name="licences_source_head">Source code</string>
-    <string name="licences_no_text">%s needs no licence text here.</string>
-    <string name="licences_licence">Star Chart is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licences, each on its own page.</string>
+    <string name="licences_no_text">%s needs no license text here.</string>
+    <string name="licences_licence">Star Chart is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licenses, each on its own page.</string>
     <string name="licences_back">Back</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
     <string name="licences_full_head">Full texts</string>
     <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
     <string name="licences_full_apache">Apache License 2.0 (full text)</string>
-    <string name="licences_full_ofl">SIL Open Font Licence 1.1 (full text)</string>
+    <string name="licences_full_ofl">SIL Open Font License 1.1 (full text)</string>
 </resources>
