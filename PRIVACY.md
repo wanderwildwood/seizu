@@ -21,7 +21,7 @@ Coarse is deliberate. A star chart needs to know which hillside you are on, not 
 of it, so fine location would be asking for more precision than the app can use.
 
 There is **no `INTERNET` permission**. Without it Android will not let the app open a
-network connection. The star catalogue ships inside the APK and every position is computed
+network connection. The star catalog ships inside the APK and every position is computed
 on the phone, so there is nothing to fetch and no way to send.
 
 There is no background location permission, and no service.

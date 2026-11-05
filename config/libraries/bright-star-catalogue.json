@@ -1,7 +1,7 @@
 {
   "uniqueId": "bright-star-catalogue",
   "name": "Bright Star Catalogue, 5th Revised Edition",
-  "description": "The stars on the chart (res/raw/bs_catalog.txt), with the catalogue's own documentation kept beside it (res/raw/bs_readme).",
+  "description": "The stars on the chart (res/raw/bs_catalog.txt), with the catalog's own documentation kept beside it (res/raw/bs_readme).",
   "developers": [{ "name": "Hoffleit and Warren, Astronomical Data Center" }],
   "website": "https://cdsarc.cds.unistra.fr/viz-bin/cat/V/50",
   "licenses": ["bright-star-catalogue-terms"]
