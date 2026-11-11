@@ -1,6 +1,4 @@
-# Star Chart
-
-星図 *seizu*
+# 星図 seizu — Star Chart
 
 The sky over you, drawn the way a paper star atlas draws it: black marks on white, for an
 E Ink phone you can take outside.
