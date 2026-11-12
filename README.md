@@ -4,7 +4,7 @@ The sky over you, drawn the way a paper star atlas draws it: black marks on whit
 E Ink phone you can take outside.
 
 Built for the [Mudita Kompakt](https://mudita.com/products/kompakt/), whose 4.3" panel has
-sixteen greys, a slow redraw, and is read outdoors as often as indoors.
+sixteen grays, a slow redraw, and is read outdoors as often as indoors.
 
 ## Screenshots
 
@@ -68,7 +68,7 @@ the chart says so: "Compass unsure — move the phone in a figure 8".
 ## The projection
 
 Azimuthal equidistant, as on every paper planisphere: the point directly overhead is the
-centre, the horizon is the rim, and distance from the centre is proportional to angle down
+center, the horizon is the rim, and distance from the center is proportional to angle down
 from the zenith.
 
 The direction you are facing goes at the **bottom** of the chart, and the button under it
@@ -84,8 +84,8 @@ a smudge.
 
 **Hairlines.** Every mark is a multiple of one base width, and that base is about a
 pixel: a bright star is a dot you can see is bigger, not a blob. Nothing is drawn thinner
-than one pixel either, because a half-pixel line on a sixteen-grey panel is not a finer
-line, it is a grey one, and grey is the one thing E Ink will not hold still. **Mark
+than one pixel either, because a half-pixel line on a sixteen-gray panel is not a finer
+line, it is a gray one, and gray is the one thing E Ink will not hold still. **Mark
 weight** in the settings moves the whole drawing together — a hairline chart for indoors,
 a heavy one for gloves and torchlight.
 
@@ -109,7 +109,7 @@ somewhere you are not.
 Point reads the compass and motion sensors, which need no permission, and only while it is
 on and the app is in front. See [PRIVACY.md](PRIVACY.md).
 
-**No `INTERNET` permission.** The catalogue ships inside the app and every position is
+**No `INTERNET` permission.** The catalog ships inside the app and every position is
 computed on the phone.
 
 ## Building
@@ -177,7 +177,7 @@ For updates without doing this by hand, add this repository to
 
     https://github.com/wanderwildwood/seizu
 
-## Licence
+## License
 
 **GNU General Public License v3.0 or later.** See [LICENSE](LICENSE).
 
