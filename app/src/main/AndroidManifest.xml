@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <queries>
+        <!-- Home, whose dark mode switch this app follows when Home is installed. -->
+        <package android:name="com.wanderwildwood.iori" />
         <!-- Which browsers the phone has, so a link never goes to the WebView test shell. -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -29,6 +31,12 @@
         android:roundIcon="@drawable/ic_launcher_mudita"
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
+        <!-- Starts dark mode before the first screen is drawn. Holds no data. -->
+        <provider
+            android:name="com.wanderwildwood.seizu.ui.DarkModeInit"
+            android:authorities="${applicationId}.darkmodeinit"
+            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
