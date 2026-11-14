@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.text.TextMMD
@@ -46,6 +47,7 @@ fun SettingsScreen(
     onLayers: (Layers) -> Unit,
     onTurnWithPhone: (Boolean) -> Unit,
 ) {
+    val context = LocalContext.current
     var aboutOpen by rememberSaveable { mutableStateOf(false) }
     val on = stringResource(R.string.settings_on)
     val off = stringResource(R.string.settings_off)
@@ -174,6 +176,9 @@ fun SettingsScreen(
             item { Gap() }
             item {
                 Line(stringResource(R.string.settings_turn), onOff(turnWithPhone)) { onTurnWithPhone(!turnWithPhone) }
+            }
+            item {
+                Line(stringResource(R.string.settings_dark), onOff(DarkMode.on)) { DarkMode.set(context, !DarkMode.on) }
             }
         }
     }
