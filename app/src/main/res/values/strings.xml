@@ -46,6 +46,8 @@
     <string name="chart_facing_west">Facing west</string>
     <!-- The same button when zoomed in. %1$s is one of the four above, %2$.1f the zoom (×2.5 means two and a half times). Keep the two spaces, and the quotes that keep them -->
     <string name="chart_facing_zoomed">"%1$s  ×%2$.1f"</string>
+    <!-- What a screen reader says for the + beside it -->
+    <string name="chart_cd_zoom_in">Zoom in</string>
 
     <!-- Point: the chart follows the way the phone's back points at the sky -->
     <!-- Button beside the facing button that turns Point on (verb: point the phone) -->

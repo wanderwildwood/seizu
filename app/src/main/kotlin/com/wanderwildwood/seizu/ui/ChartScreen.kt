@@ -44,6 +44,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 
 /**
  * The chart, and underneath it the two facts that decide what is on it.
@@ -71,6 +73,7 @@ fun ChartScreen(
     onPoint: () -> Unit,
     onHold: () -> Unit,
 ) {
+    val zoomIn = stringResource(R.string.chart_cd_zoom_in)
     val pointing = state.pointing
     val aim = pointing?.aim
     // What the cross is on, worked out again only when the picture changes.
@@ -200,7 +203,7 @@ fun ChartScreen(
 
                     OutlinedButtonMMD(
                         onClick = onZoomIn,
-                        modifier = Modifier.width(48.dp).height(48.dp),
+                        modifier = Modifier.width(48.dp).height(48.dp).semantics { contentDescription = zoomIn },
                         contentPadding = PaddingValues(0.dp),
                     ) { TextMMD(text = "+", style = MaterialTheme.typography.bodyMedium) }
                 }
