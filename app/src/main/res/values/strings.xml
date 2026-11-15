@@ -213,8 +213,8 @@
     <string name="about_catalogue">Stars from the Yale Bright Star Catalog. Every position is computed on the phone; the outer planets come from JPL Horizons tables for 1979 to 2050.</string>
     <!-- Heading above the privacy paragraph -->
     <string name="about_privacy_heading">Privacy</string>
-    <!-- "Ask the GPS" and "Point" are the names of buttons in the app; keep them the same as there -->
-    <string name="about_privacy_body">Everything you put in this app stays on this phone. It has no internet access, so nothing is sent anywhere, and nothing is collected about you. It asks for your rough location only when you press Ask the GPS. The compass and motion sensors are read on the phone only while Point is on. There are no ads, no analytics and no tracking.</string>
+    <!-- "Use last known place" and "Point" are the names of buttons in the app; keep them the same as there -->
+    <string name="about_privacy_body">Everything you put in this app stays on this phone. It has no internet access, so nothing is sent anywhere, and nothing is collected about you. It asks for your rough location only when you press Use last known place. The compass and motion sensors are read on the phone only while Point is on. There are no ads, no analytics and no tracking.</string>
     <!-- Heading above the terms paragraph -->
     <string name="about_terms_heading">Terms</string>
     <string name="about_terms_body">This app is free software under the GNU General Public License v3 or later. It comes with no warranty: use it at your own risk.</string>
@@ -228,7 +228,7 @@
     <string name="licences_title">Licenses</string>
     <string name="licences_source_head">Source code</string>
     <string name="licences_no_text">%s needs no license text here.</string>
-    <string name="licences_licence">Star Chart is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licenses, listed below.</string>
+    <string name="licences_licence">Star Chart is free software: GPL-3.0-or-later, copyright wander wildwood. What it is built on keeps its own licenses, listed below.</string>
     <string name="licences_back">Back</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
     <string name="licences_full_head">Full texts</string>

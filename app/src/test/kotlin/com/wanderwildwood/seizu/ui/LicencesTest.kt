@@ -21,7 +21,7 @@ class LicencesTest {
 
     private val data by lazy {
         LicencesData(
-            "seizu", SOURCE_URL, "GPL-3.0-only", generated,
+            "seizu", SOURCE_URL, "GPL-3.0-or-later", generated,
             LICENCE_RAW.map { LicenceText(it.first, it.first, it.second) }, emptyList(),
         )
     }

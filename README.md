@@ -104,7 +104,7 @@ A chart you cannot orient is not a chart.
 
 ## What it does not do
 
-One permission, `ACCESS_COARSE_LOCATION`, and only if you press "Ask the GPS". Typing a
+One permission, `ACCESS_COARSE_LOCATION`, and only if you press "Use last known place". Typing a
 latitude and longitude works without granting anything, and is the only way to chart
 somewhere you are not.
 

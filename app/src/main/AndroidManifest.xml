@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-      Coarse location only, and only if you press "Ask the GPS". A star chart needs to know
+      Coarse location only, and only if you press "Use last known place". A star chart needs to know
       which hillside you are on, not which end of it, so fine location would be asking for
       more than the app can use. Typing a latitude and longitude works without granting
       anything at all, and is the only way to chart somewhere you are not.

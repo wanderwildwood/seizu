@@ -13,7 +13,7 @@ That is the whole policy. The rest of this page is the evidence for it.
 android.permission.ACCESS_COARSE_LOCATION
 ```
 
-It is requested only when you press **Ask the GPS** in the Where dialog. Typing a latitude
+It is requested only when you press **Use last known place** in the Where dialog. Typing a latitude
 and longitude works without granting anything at all — and typing is the only way to chart
 somewhere you are not standing, which is half of what a planisphere is for.
 
