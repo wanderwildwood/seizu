@@ -18,6 +18,7 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.wanderwildwood.seizu.BuildConfig
 import com.wanderwildwood.seizu.sky.BodyKind
+import com.wanderwildwood.seizu.sky.PlaceEntry
 import com.wanderwildwood.seizu.sky.TimeEntry
 import com.wanderwildwood.seizu.sky.SkyBody
 import com.wanderwildwood.seizu.sky.SkyObject
@@ -76,8 +77,9 @@ fun LocationDialog(
     // The numbers without their signs, and the side of the equator and of Greenwich as a
     // button beside each: a number keyboard does not always have a minus on it, and a
     // longitude west of Greenwich typed without one is the other side of the world.
-    var lat by rememberSaveable { mutableStateOf(abs(latitude).toString()) }
-    var lon by rememberSaveable { mutableStateOf(abs(longitude).toString()) }
+    // To four decimals (about ten meters), not the phone's fix to the last bit of a double.
+    var lat by rememberSaveable { mutableStateOf(PlaceEntry.degreesText(latitude)) }
+    var lon by rememberSaveable { mutableStateOf(PlaceEntry.degreesText(longitude)) }
     var north by rememberSaveable { mutableStateOf(latitude >= 0) }
     var east by rememberSaveable { mutableStateOf(longitude >= 0) }
     var bad by rememberSaveable { mutableStateOf(false) }
@@ -112,7 +114,9 @@ fun LocationDialog(
                 )
             }
         }, second = {
-            OutlinedButtonMMD(
+            // The one press that goes ahead is filled; the rest are outlined.
+            HouseButton(
+                label = stringResource(R.string.where_use_this),
                 onClick = {
                     val la = signed(lat, north)
                     val lo = signed(lon, east)
@@ -122,42 +126,36 @@ fun LocationDialog(
                         onSet(la, lo)
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-            ) { TextMMD(text = stringResource(R.string.where_use_this), style = MaterialTheme.typography.bodySmall) }
+                modifier = Modifier.fillMaxWidth(),
+                on = true,
+            )
 
             if (canUseGps) {
                 Spacer(Modifier.height(8.dp))
-                OutlinedButtonMMD(
-                    onClick = onUseGps,
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                ) { TextMMD(text = stringResource(R.string.where_ask_gps), style = MaterialTheme.typography.bodySmall) }
-
                 if (denied) {
+                    // Refused: the same place in the dialog now leads to where it can be given
+                    // back, instead of a second button under the first. Two buttons and two
+                    // messages ran the dialog off the foot of the panel.
+                    HouseButton(stringResource(R.string.open_app_settings), onOpenSettings, Modifier.fillMaxWidth())
                     Spacer(Modifier.height(8.dp))
                     TextMMD(
                         text = stringResource(R.string.where_denied),
                         style = MaterialTheme.typography.labelSmall,
                     )
-                    OutlinedButtonMMD(
-                        onClick = onOpenSettings,
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                    ) { TextMMD(text = stringResource(R.string.open_app_settings), style = MaterialTheme.typography.bodySmall) }
-                }
-
-                if (noFix) {
-                    Spacer(Modifier.height(8.dp))
-                    TextMMD(
-                        text = stringResource(R.string.where_no_fix),
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+                } else {
+                    HouseButton(stringResource(R.string.where_ask_gps), onUseGps, Modifier.fillMaxWidth())
+                    if (noFix) {
+                        Spacer(Modifier.height(8.dp))
+                        TextMMD(
+                            text = stringResource(R.string.where_no_fix),
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
                 }
             }
 
             Spacer(Modifier.height(8.dp))
-            OutlinedButtonMMD(
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-            ) { TextMMD(text = stringResource(R.string.where_cancel), style = MaterialTheme.typography.bodySmall) }
+            HouseButton(stringResource(R.string.where_cancel), onDismiss, Modifier.fillMaxWidth())
         })
     }
 }
@@ -259,7 +257,8 @@ fun TimeDialog(
             }
 
             Spacer(Modifier.height(12.dp))
-            OutlinedButtonMMD(
+            HouseButton(
+                label = stringResource(R.string.when_chart_this_moment),
                 onClick = {
                     val y = year.trim().toIntOrNull()
                     val mo = month.trim().toIntOrNull()
@@ -274,20 +273,15 @@ fun TimeDialog(
                         onSet(GregorianCalendar(y, mo - 1, d, h, mi))
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-            ) { TextMMD(text = stringResource(R.string.when_chart_this_moment), style = MaterialTheme.typography.bodySmall) }
+                modifier = Modifier.fillMaxWidth(),
+                on = true,
+            )
 
             Spacer(Modifier.height(8.dp))
-            OutlinedButtonMMD(
-                onClick = { onSet(null) },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-            ) { TextMMD(text = stringResource(R.string.when_back_to_now), style = MaterialTheme.typography.bodySmall) }
+            HouseButton(stringResource(R.string.when_back_to_now), { onSet(null) }, Modifier.fillMaxWidth())
 
             Spacer(Modifier.height(8.dp))
-            OutlinedButtonMMD(
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-            ) { TextMMD(text = stringResource(R.string.when_cancel), style = MaterialTheme.typography.bodySmall) }
+            HouseButton(stringResource(R.string.when_cancel), onDismiss, Modifier.fillMaxWidth())
         })
     }
 }

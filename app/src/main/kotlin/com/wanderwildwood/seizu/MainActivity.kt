@@ -23,7 +23,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
+import com.wanderwildwood.seizu.sky.millisToNextMinute
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mudita.mmd.ThemeMMD
@@ -95,13 +100,34 @@ private fun StarChart(viewModel: ChartViewModel) {
     // Set when the GPS was asked and had nothing cached. Cleared whenever the dialog is
     // opened again, so a message from last time is never the first thing read.
     var noFix by rememberSaveable { mutableStateOf(false) }
-    // Location refused for good: the dialog stays and says where to give it back.
+    // Location refused: the dialog stays and says where to give it back.
     var locationDenied by rememberSaveable { mutableStateOf(false) }
+    // Coming back from Android's settings with the permission given, the refusal is over:
+    // nothing else on the screen changes on the way back, so it is looked at on resume.
+    LifecycleResumeEffect(Unit) {
+        if (locationDenied && hasLocation(context)) locationDenied = false
+        onPauseOrDispose { }
+    }
 
     // The chart starts at Greenwich, which is nobody's hillside: on the first run, ask where.
     LaunchedEffect(Unit) {
         viewModel.load()
         if (!viewModel.placeSaved) whereOpen = true
+    }
+
+    // "Now" follows the clock: the sky is drawn again as each minute turns, and at once on
+    // coming back to the chart, while the app is in front. One frame a minute; a chosen
+    // moment stands still, and nothing runs behind Settings or in the background.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val followsClock = state.fixedTime == null && !settingsOpen
+    LaunchedEffect(followsClock, lifecycleOwner) {
+        if (!followsClock) return@LaunchedEffect
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            while (true) {
+                viewModel.followClock()
+                delay(millisToNextMinute(System.currentTimeMillis()))
+            }
+        }
     }
 
     val sensor = remember { PointSensor(context.applicationContext) }
@@ -194,6 +220,8 @@ private fun StarChart(viewModel: ChartViewModel) {
                 if (!hasLocation(context)) {
                     if (locationDenied) openAppSettings(context) else ask.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
                 } else {
+                    // Allowed now, however it was answered before.
+                    locationDenied = false
                     val fix = lastKnownLocation(context)
                     if (fix == null) {
                         noFix = true

@@ -102,6 +102,11 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /** The clock has moved on: draw the sky again if the chart is following it. */
+    fun followClock() {
+        if (_state.value.fixedTime == null) rebuild()
+    }
+
     /** False on a first run: no place has been chosen yet. */
     val placeSaved: Boolean get() = preferences.placeSaved
 
@@ -241,3 +246,6 @@ fun steppedTime(from: GregorianCalendar, hours: Int, days: Int): GregorianCalend
     next.add(Calendar.HOUR_OF_DAY, hours)
     return next
 }
+
+/** How long until the clock next shows a new minute; a whole minute when it has just turned. */
+fun millisToNextMinute(nowMillis: Long): Long = 60_000L - nowMillis.mod(60_000L)
