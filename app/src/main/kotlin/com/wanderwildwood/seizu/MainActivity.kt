@@ -41,6 +41,7 @@ import com.wanderwildwood.seizu.ui.SettingsScreen
 import com.wanderwildwood.seizu.ui.TimeDialog
 import com.wanderwildwood.seizu.ui.houseTypography
 import com.wanderwildwood.seizu.ui.monochrome
+import com.wanderwildwood.seizu.ui.DarkSelection
 
 class MainActivity : ComponentActivity() {
     private val turner = TurnWithPhone(this)
@@ -79,9 +80,9 @@ class MainActivity : ComponentActivity() {
             // A steady cursor: a blinking one is a repaint twice a second on an E Ink panel
             // for as long as a field has focus.
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
-                ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+                ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                     StarChart(viewModel)
-                }
+                } }
             }
         }
     }
