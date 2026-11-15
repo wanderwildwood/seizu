@@ -31,7 +31,13 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -83,6 +89,19 @@ fun LocationDialog(
     var north by rememberSaveable { mutableStateOf(latitude >= 0) }
     var east by rememberSaveable { mutableStateOf(longitude >= 0) }
     var bad by rememberSaveable { mutableStateOf(false) }
+    val useThis = {
+        val la = signed(lat, north)
+        val lo = signed(lon, east)
+        if (la == null || lo == null || la < -90 || la > 90 || lo < -180 || lo > 180) {
+            bad = true
+        } else {
+            onSet(la, lo)
+        }
+    }
+    // The keyboard covers the buttons under the fields, so its own keys go on: Next from
+    // latitude to longitude, and Done in longitude is "Use this place".
+    val lonField = remember { FocusRequester() }
+    val focus = LocalFocusManager.current
 
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(text = stringResource(R.string.where_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
@@ -95,6 +114,8 @@ fun LocationDialog(
                 side = stringResource(if (north) R.string.compass_north else R.string.compass_south),
                 sideDescription = stringResource(R.string.where_cd_north_south),
                 onSide = { north = !north },
+                imeAction = ImeAction.Next,
+                onIme = { lonField.requestFocus() },
             )
             Spacer(Modifier.height(10.dp))
             TextMMD(text = stringResource(R.string.where_longitude), style = MaterialTheme.typography.labelSmall)
@@ -104,6 +125,9 @@ fun LocationDialog(
                 side = stringResource(if (east) R.string.compass_east else R.string.compass_west),
                 sideDescription = stringResource(R.string.where_cd_east_west),
                 onSide = { east = !east },
+                imeAction = ImeAction.Done,
+                onIme = { focus.clearFocus(); useThis() },
+                fieldModifier = Modifier.focusRequester(lonField),
             )
 
             if (bad) {
@@ -117,15 +141,7 @@ fun LocationDialog(
             // The one press that goes ahead is filled; the rest are outlined.
             HouseButton(
                 label = stringResource(R.string.where_use_this),
-                onClick = {
-                    val la = signed(lat, north)
-                    val lo = signed(lon, east)
-                    if (la == null || lo == null || la < -90 || la > 90 || lo < -180 || lo > 180) {
-                        bad = true
-                    } else {
-                        onSet(la, lo)
-                    }
-                },
+                onClick = useThis,
                 modifier = Modifier.fillMaxWidth(),
                 on = true,
             )
@@ -212,6 +228,26 @@ fun TimeDialog(
         bad = false
     }
 
+    val chart = {
+        val y = year.trim().toIntOrNull()
+        val mo = month.trim().toIntOrNull()
+        val d = day.trim().toIntOrNull()
+        val h = hour24()
+        val mi = minute.trim().toIntOrNull()
+        if (y == null || mo == null || d == null || h == null || mi == null ||
+            !TimeEntry.dateOk(y, mo, d) || mi !in 0..59
+        ) {
+            bad = true
+        } else {
+            onSet(GregorianCalendar(y, mo - 1, d, h, mi))
+        }
+    }
+    // The keyboard covers the buttons under the fields, so its own keys go on: Next from
+    // year to month, day, hour and minute, and Done in minute is "Chart this moment".
+    val fields = remember { List(5) { FocusRequester() } }
+    val focus = LocalFocusManager.current
+    fun fieldAt(i: Int) = Modifier.focusRequester(fields[i])
+
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(text = stringResource(R.string.when_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(12.dp))
@@ -220,18 +256,18 @@ fun TimeDialog(
             // date is one fact, and stacked it took two thirds of the dialog's height for it.
             TextMMD(text = stringResource(R.string.when_date), style = MaterialTheme.typography.labelSmall)
             Row(modifier = Modifier.fillMaxWidth()) {
-                NumberField(value = year, onValue = { year = it; bad = false }, modifier = Modifier.weight(1.4f))
+                NumberField(value = year, onValue = { year = it; bad = false }, modifier = Modifier.weight(1.4f).then(fieldAt(0)), onNext = { fields[1].requestFocus() })
                 Spacer(Modifier.width(6.dp))
-                NumberField(value = month, onValue = { month = it; bad = false }, modifier = Modifier.weight(1f))
+                NumberField(value = month, onValue = { month = it; bad = false }, modifier = Modifier.weight(1f).then(fieldAt(1)), onNext = { fields[2].requestFocus() })
                 Spacer(Modifier.width(6.dp))
-                NumberField(value = day, onValue = { day = it; bad = false }, modifier = Modifier.weight(1f))
+                NumberField(value = day, onValue = { day = it; bad = false }, modifier = Modifier.weight(1f).then(fieldAt(2)), onNext = { fields[3].requestFocus() })
             }
             Spacer(Modifier.height(8.dp))
             TextMMD(text = stringResource(R.string.when_time), style = MaterialTheme.typography.labelSmall)
             Row(modifier = Modifier.fillMaxWidth()) {
-                NumberField(value = hour, onValue = { hour = it; bad = false }, modifier = Modifier.weight(1f))
+                NumberField(value = hour, onValue = { hour = it; bad = false }, modifier = Modifier.weight(1f).then(fieldAt(3)), onNext = { fields[4].requestFocus() })
                 Spacer(Modifier.width(6.dp))
-                NumberField(value = minute, onValue = { minute = it; bad = false }, modifier = Modifier.weight(1f))
+                NumberField(value = minute, onValue = { minute = it; bad = false }, modifier = Modifier.weight(1f).then(fieldAt(4)), onDone = { focus.clearFocus(); chart() })
                 if (!is24) {
                     Spacer(Modifier.width(6.dp))
                     StepButton(
@@ -259,20 +295,7 @@ fun TimeDialog(
             Spacer(Modifier.height(12.dp))
             HouseButton(
                 label = stringResource(R.string.when_chart_this_moment),
-                onClick = {
-                    val y = year.trim().toIntOrNull()
-                    val mo = month.trim().toIntOrNull()
-                    val d = day.trim().toIntOrNull()
-                    val h = hour24()
-                    val mi = minute.trim().toIntOrNull()
-                    if (y == null || mo == null || d == null || h == null || mi == null ||
-                        !TimeEntry.dateOk(y, mo, d) || mi !in 0..59
-                    ) {
-                        bad = true
-                    } else {
-                        onSet(GregorianCalendar(y, mo - 1, d, h, mi))
-                    }
-                },
+                onClick = chart,
                 modifier = Modifier.fillMaxWidth(),
                 on = true,
             )
@@ -363,14 +386,18 @@ private fun DegreesField(
     side: String,
     sideDescription: String,
     onSide: () -> Unit,
+    imeAction: ImeAction,
+    onIme: () -> Unit,
+    fieldModifier: Modifier = Modifier,
 ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         TextFieldMMD(
             value = value,
             onValueChange = onValue,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).then(fieldModifier),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = imeAction),
+            keyboardActions = KeyboardActions(onNext = { onIme() }, onDone = { onIme() }),
         )
         Spacer(Modifier.width(8.dp))
         OutlinedButtonMMD(
@@ -385,13 +412,23 @@ private fun DegreesField(
 
 /** A short whole number, typed on the number keyboard. */
 @Composable
-private fun NumberField(value: String, onValue: (String) -> Unit, modifier: Modifier) {
+private fun NumberField(
+    value: String,
+    onValue: (String) -> Unit,
+    modifier: Modifier,
+    onNext: (() -> Unit)? = null,
+    onDone: (() -> Unit)? = null,
+) {
     TextFieldMMD(
         value = value,
         onValueChange = onValue,
         modifier = modifier,
         singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = if (onDone != null) ImeAction.Done else ImeAction.Next,
+        ),
+        keyboardActions = KeyboardActions(onNext = { onNext?.invoke() }, onDone = { onDone?.invoke() }),
     )
 }
 
