@@ -214,10 +214,10 @@
     <!-- Heading above the privacy paragraph -->
     <string name="about_privacy_heading">Privacy</string>
     <!-- "Use last known place" and "Point" are the names of buttons in the app; keep them the same as there -->
-    <string name="about_privacy_body">Everything you put in this app stays on this phone. It has no internet access, so nothing is sent anywhere, and nothing is collected about you. It asks for your rough location only when you press Use last known place. The compass and motion sensors are read on the phone only while Point is on. There are no ads, no analytics and no tracking.</string>
+    <string name="about_privacy_body">Everything you put in this app stays on this phone. It has no internet access, so nothing is sent anywhere, and nothing is collected about you. It asks for your rough location only when you press Use last known place. The compass and motion sensors are read on the phone only while Point is on. There are no ads, no analytics and no tracking. \"Feed the llamas\" in About opens a donation page (square.link) in your browser, only when you press it. The app sends nothing there; if you give, the payment is handled on that page by Square, not by this app.</string>
     <!-- Heading above the terms paragraph -->
     <string name="about_terms_heading">Terms</string>
-    <string name="about_terms_body">This app is free software under the GNU General Public License v3 or later. It comes with no warranty: use it at your own risk.</string>
+    <string name="about_terms_body">This app is free software under the GNU General Public License v3 or later. It comes with no warranty: use it at your own risk. A donation through \"Feed the llamas\" is voluntary and unlocks nothing: the app is the same with or without one.</string>
     <string name="about_after">After AndroidPlanisphere by Timo Engel, whose astronomy this runs on unchanged.</string>
     <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
     <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
