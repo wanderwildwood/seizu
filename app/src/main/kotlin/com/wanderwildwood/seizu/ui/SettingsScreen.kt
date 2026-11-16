@@ -70,6 +70,9 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .padding(horizontal = 20.dp),
+            // About opens over this page; its page arrows showed below the window as if they were
+            // About's own. They go while it is open.
+            isScrollbarVisible = !aboutOpen,
         ) {
             item {
                 Cells {
