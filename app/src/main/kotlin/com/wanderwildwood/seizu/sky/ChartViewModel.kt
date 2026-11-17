@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.GregorianCalendar
@@ -66,6 +68,8 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     val state: StateFlow<ChartState> = _state.asStateFlow()
 
     private var builder: SkyBuilder? = null
+    private val buildLock = Mutex()
+    private var rebuilds = 0
 
     private val settler = Settler()
 
@@ -92,13 +96,20 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     /** Rebuild the whole sky. Everything that changes the chart ends up here. */
     fun rebuild() {
         val current = builder ?: return
+        val request = ++rebuilds
         viewModelScope.launch {
-            val s = _state.value
-            val time = s.fixedTime ?: GregorianCalendar()
-            val scene = withContext(Dispatchers.Default) {
-                current.build(time, s.latitude, s.longitude, s.layers)
+            // One build at a time: the planets underneath are shared objects, and two builds
+            // side by side would mix their positions. A request overtaken by a newer one
+            // while it waited is dropped; the newer one reads the state as it is then.
+            buildLock.withLock {
+                if (request != rebuilds) return@withLock
+                val s = _state.value
+                val time = s.fixedTime ?: GregorianCalendar()
+                val scene = withContext(Dispatchers.Default) {
+                    current.build(time, s.latitude, s.longitude, s.layers)
+                }
+                _state.update { it.copy(scene = scene, loading = false) }
             }
-            _state.update { it.copy(scene = scene, loading = false) }
         }
     }
 

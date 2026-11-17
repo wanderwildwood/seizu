@@ -34,7 +34,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 
 class OrbitalElements
 {
@@ -216,23 +215,24 @@ abstract class PlanetCsv extends Planet
      */
     protected OrbitalElements findClosestOe(GregorianCalendar date)
     {
-        double last_diff = Double.MAX_VALUE;
-        OrbitalElements e = null, last_e = null;
-        Iterator<OrbitalElements> oeIt = mElements.iterator();
-        while (oeIt.hasNext())
+        // The day difference goes on the copy, never on the shared table row, and is set
+        // for the last row too: a date past the middle of the final step used to keep 0.
+        double jd = Astro.julian_date(date);
+        OrbitalElements best = null;
+        double bestDiff = 0.0;
+        for (OrbitalElements e : mElements)
         {
-            e = oeIt.next();
-            double diff = Astro.julian_date(date) - e.JD;
-            if (Math.abs(last_diff) < Math.abs(diff))
+            double diff = jd - e.JD;
+            if (best != null && Math.abs(bestDiff) < Math.abs(diff))
             {
-                e = last_e;
-                e.dayDiff = last_diff;
                 break;
             }
-            last_e = e;
-            last_diff = diff;
+            best = e;
+            bestDiff = diff;
         }
-        return new OrbitalElements(e);
+        OrbitalElements copy = new OrbitalElements(best);
+        copy.dayDiff = bestDiff;
+        return copy;
     }
 
     public void calcHeliocentric(GregorianCalendar date) // visibility widened
