@@ -1,6 +1,7 @@
 package com.wanderwildwood.seizu.sky
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class PlaceEntryTest {
@@ -26,5 +27,21 @@ class PlaceEntryTest {
         assertEquals(60_000L, millisToNextMinute(1_800_000_000_000L))
         assertEquals(1L, millisToNextMinute(1_800_000_059_999L))
         assertEquals(45_000L, millisToNextMinute(1_800_000_015_000L))
+    }
+
+    @Test fun `a typed place reads back with its side`() {
+        assertEquals(51.4778, PlaceEntry.degrees("51.4778", true, 90.0)!!, 0.0)
+        assertEquals(-0.0014, PlaceEntry.degrees(" 0,0014 ", false, 180.0)!!, 0.0)
+        assertEquals(-33.0, PlaceEntry.degrees("33", false, 90.0)!!, 0.0)
+        assertEquals(90.0, PlaceEntry.degrees("90", true, 90.0)!!, 0.0)
+    }
+
+    @Test fun `no number, out of range or not finite is no place`() {
+        assertNull(PlaceEntry.degrees("", true, 90.0))
+        assertNull(PlaceEntry.degrees("north", true, 90.0))
+        assertNull(PlaceEntry.degrees("90.5", true, 90.0))
+        assertNull(PlaceEntry.degrees("-181", true, 180.0))
+        assertNull(PlaceEntry.degrees("NaN", true, 90.0))
+        assertNull(PlaceEntry.degrees("Infinity", false, 180.0))
     }
 }

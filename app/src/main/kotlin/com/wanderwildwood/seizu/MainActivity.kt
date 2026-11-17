@@ -111,9 +111,13 @@ private fun StarChart(viewModel: ChartViewModel) {
     }
 
     // The chart starts at Greenwich, which is nobody's hillside: on the first run, ask where.
+    // Asked once per visit: closed without a place, it does not come back each time the
+    // window is built again (turning sideways, say).
+    var askedWhere by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         viewModel.load()
-        if (!viewModel.placeSaved) whereOpen = true
+        if (!askedWhere && !viewModel.placeSaved) whereOpen = true
+        askedWhere = true
     }
 
     // "Now" follows the clock: the sky is drawn again as each minute turns, and at once on

@@ -9,11 +9,11 @@ class Preferences(context: Context) {
 
     /** Greenwich until told otherwise — a real place, and obviously not yours. */
     var latitude: Double
-        get() = Double.fromBits(store.getLong(LAT, DEFAULT_LAT.toRawBits()))
+        get() = Double.fromBits(store.getLong(LAT, DEFAULT_LAT.toRawBits())).takeIf { it.isFinite() } ?: DEFAULT_LAT
         set(value) = store.edit().putLong(LAT, value.toRawBits()).apply()
 
     var longitude: Double
-        get() = Double.fromBits(store.getLong(LON, DEFAULT_LON.toRawBits()))
+        get() = Double.fromBits(store.getLong(LON, DEFAULT_LON.toRawBits())).takeIf { it.isFinite() } ?: DEFAULT_LON
         set(value) = store.edit().putLong(LON, value.toRawBits()).apply()
 
     /** Whether a place was ever chosen. Until then the chart is drawn for Greenwich, and says so by asking. */

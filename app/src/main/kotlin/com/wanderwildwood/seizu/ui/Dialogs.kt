@@ -90,9 +90,9 @@ fun LocationDialog(
     var east by rememberSaveable { mutableStateOf(longitude >= 0) }
     var bad by rememberSaveable { mutableStateOf(false) }
     val useThis = {
-        val la = signed(lat, north)
-        val lo = signed(lon, east)
-        if (la == null || lo == null || la < -90 || la > 90 || lo < -180 || lo > 180) {
+        val la = PlaceEntry.degrees(lat, north, 90.0)
+        val lo = PlaceEntry.degrees(lon, east, 180.0)
+        if (la == null || lo == null) {
             bad = true
         } else {
             onSet(la, lo)
@@ -367,15 +367,6 @@ fun ObjectDialog(objectAt: SkyObject, onDismiss: () -> Unit) {
 private fun Line(label: String, value: String) {
     TextMMD(text = stringResource(R.string.object_line, label, value), style = MaterialTheme.typography.labelSmall)
     Spacer(Modifier.height(4.dp))
-}
-
-/**
- * A number typed without its sign, given the sign of the side chosen beside it. A minus
- * typed anyway, on a keyboard that has one, turns the side over rather than being lost.
- */
-private fun signed(text: String, positiveSide: Boolean): Double? {
-    val value = text.trim().replace(',', '.').toDoubleOrNull() ?: return null
-    return if (positiveSide) value else -value
 }
 
 /** A number of degrees, with the side it lies on as a button after it. */

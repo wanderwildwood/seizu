@@ -13,4 +13,16 @@ object PlaceEntry {
      */
     fun degreesText(degrees: Double): String =
         BigDecimal(abs(degrees)).setScale(4, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+
+    /**
+     * A typed field read back as signed degrees: a comma counts as a decimal point, the side
+     * button gives the sign, and a minus typed anyway turns the side over rather than being
+     * lost. Null for anything that is not a finite number up to [limit]
+     * (90 for latitude, 180 for longitude); "NaN" and "Infinity" parse as doubles but are no place.
+     */
+    fun degrees(text: String, positiveSide: Boolean, limit: Double): Double? {
+        val value = text.trim().replace(',', '.').toDoubleOrNull() ?: return null
+        if (!value.isFinite() || abs(value) > limit) return null
+        return if (positiveSide) value else -value
+    }
 }
