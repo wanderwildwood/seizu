@@ -21,12 +21,12 @@ be read in the daylight this phone is otherwise good in; and it drowns every mar
 to sit on top of it.
 
 Printed star atlases have been black-on-white for four hundred years, and they are the
-ones people actually take outdoors and read by torchlight. That is the situation this is
+ones people actually take outdoors and read by flashlight. That is the situation this is
 for.
 
 ## What it shows
 
-- **Nine thousand stars** from the Yale Bright Star Catalogue, sized by magnitude. On a
+- **Nine thousand stars** from the Yale Bright Star Catalog, sized by magnitude. On a
   screen with no brightness to spare, size carries the whole of that information.
 - **The constellation figures**, their names — in Latin, in English or as the three-letter
   abbreviation — and, if you want them, the IAU boundaries.
@@ -89,7 +89,7 @@ pixel: a bright star is a dot you can see is bigger, not a blob. Nothing is draw
 than one pixel either, because a half-pixel line on a sixteen-gray panel is not a finer
 line, it is a gray one, and gray is the one thing E Ink will not hold still. **Mark
 weight** in the settings moves the whole drawing together — a hairline chart for indoors,
-a heavy one for gloves and torchlight.
+a heavy one for gloves and flashlight.
 
 **Words that do not pile up.** Labels are collected as the chart is drawn and put down
 last, in order of what you are most likely to be looking for: the compass, then the
@@ -146,7 +146,7 @@ Everything above that line — the scene assembly, the projection, the drawing a
 interface — is new, in Jetpack Compose against [MMD](https://github.com/mudita/MMD),
 Mudita's E Ink component library.
 
-Star data is the **Yale Bright Star Catalogue**, 5th Revised Edition (Hoffleit & Warren);
+Star data is the **Yale Bright Star Catalog**, 5th Revised Edition (Hoffleit & Warren);
 `app/src/main/res/raw/bs_readme` is its own documentation, kept with it.
 
 Icons are [Material Symbols](https://fonts.google.com/icons), Apache License 2.0.
