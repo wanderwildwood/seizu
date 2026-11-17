@@ -41,6 +41,9 @@ Your chosen latitude and longitude, which way the chart is turned, whether it tu
 sideways with the phone, and which layers are switched on. Where Point is looking is not
 stored. All in `SharedPreferences`, all visible in `sky/Preferences.kt`.
 
+Whether dark mode is on is kept beside them, in `ui/DarkMode.kt`. When Home is installed,
+the app reads Home's dark mode switch, a yes or no, and sends nothing to it.
+
 No history, no log of where you have been, no record of what you looked at.
 
 ## No analytics
