@@ -16,8 +16,15 @@ class Preferences(context: Context) {
         get() = Double.fromBits(store.getLong(LON, DEFAULT_LON.toRawBits())).takeIf { it.isFinite() } ?: DEFAULT_LON
         set(value) = store.edit().putLong(LON, value.toRawBits()).apply()
 
-    /** Whether a place was ever chosen. Until then the chart is drawn for Greenwich, and says so by asking. */
-    val placeSaved: Boolean get() = store.contains(LAT) && store.contains(LON)
+    /**
+     * Whether a place was ever chosen. Until then the chart is drawn for Greenwich, and says so by asking.
+     * A stored place that is not a number (an older Where dialog let one through) counts as none,
+     * so the question comes back rather than Greenwich standing in silently.
+     */
+    val placeSaved: Boolean get() = finite(LAT) && finite(LON)
+
+    private fun finite(key: String): Boolean =
+        store.contains(key) && runCatching { Double.fromBits(store.getLong(key, 0L)).isFinite() }.getOrDefault(false)
 
     var facing: Int
         get() = store.getInt(FACING, 0)
