@@ -62,6 +62,7 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
             latitude = preferences.latitude,
             longitude = preferences.longitude,
             facing = preferences.facing,
+            usingGps = preferences.placeFromGps,
             turnWithPhone = preferences.turnWithPhone,
         )
     )
@@ -124,6 +125,7 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     fun setLocation(latitude: Double, longitude: Double, fromGps: Boolean = false) {
         preferences.latitude = latitude
         preferences.longitude = longitude
+        preferences.placeFromGps = fromGps
         _state.update { it.copy(latitude = latitude, longitude = longitude, usingGps = fromGps) }
         refreshDeclination()
         rebuild()

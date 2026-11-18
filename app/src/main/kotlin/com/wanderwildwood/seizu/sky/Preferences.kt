@@ -26,6 +26,11 @@ class Preferences(context: Context) {
     private fun finite(key: String): Boolean =
         store.contains(key) && runCatching { Double.fromBits(store.getLong(key, 0L)).isFinite() }.getOrDefault(false)
 
+    /** Whether the place came from the phone's own fix rather than being typed. */
+    var placeFromGps: Boolean
+        get() = store.getBoolean(PLACE_FROM_GPS, false)
+        set(value) = store.edit().putBoolean(PLACE_FROM_GPS, value).apply()
+
     var facing: Int
         get() = store.getInt(FACING, 0)
         set(value) = store.edit().putInt(FACING, value).apply()
@@ -91,6 +96,7 @@ class Preferences(context: Context) {
         const val DEFAULT_LON = -0.0014
         const val LAT = "lat"
         const val LON = "lon"
+        const val PLACE_FROM_GPS = "placeFromGps"
         const val FACING = "facing"
         const val TURN_WITH_PHONE = "turnWithPhone"
         const val CONST_LINES = "constLines"

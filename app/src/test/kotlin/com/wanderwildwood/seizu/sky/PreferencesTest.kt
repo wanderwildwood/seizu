@@ -34,6 +34,13 @@ class PreferencesTest {
     }
 
     @Test
+    fun aPlaceFromThePhoneIsRememberedAsSuch() {
+        assertFalse(Preferences(context).placeFromGps)
+        Preferences(context).placeFromGps = true
+        assertTrue(Preferences(context).placeFromGps)
+    }
+
+    @Test
     fun nothingStoredIsNotSaved() {
         assertFalse(Preferences(context).placeSaved)
     }
