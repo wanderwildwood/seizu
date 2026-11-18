@@ -12,7 +12,7 @@ sixteen grays, a slow redraw, and is read outdoors as often as indoors.
 |---|---|---|---|
 | ![Chart](screenshots/01-chart.png) | ![An object](screenshots/02-object.png) | ![Settings](screenshots/03-settings.png) | ![About](screenshots/04-about.png) |
 
-## Why it is not white-on-black
+## Why it is black on white
 
 Every other star chart on a screen draws white stars on a black field, because it is
 imitating the night. Here that would be the worst possible choice. A full screen of black
@@ -22,7 +22,8 @@ to sit on top of it.
 
 Printed star atlases have been black-on-white for four hundred years, and they are the
 ones people actually take outdoors and read by flashlight. That is the situation this is
-for.
+for, so black on white is the default. If you would rather have the night look anyway,
+**Dark mode** in Settings turns the whole window over, chart included.
 
 ## What it shows
 

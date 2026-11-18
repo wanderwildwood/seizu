@@ -211,7 +211,7 @@
 
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Star Chart %1$s</string>
-    <string name="about_what">The sky over you as a paper star atlas draws it, black on white: nine thousand stars, the constellations and planets, at any moment and place. Hold up the phone and press Point for the sky it faces.</string>
+    <string name="about_what">The sky over you as a paper star atlas draws it, black on white: nine thousand stars, the constellations and planets, at any moment and place. Hold up the phone and press Point for the sky it faces. Dark mode turns it over, white on black.</string>
     <string name="about_catalogue">Stars from the Yale Bright Star Catalog. Every position is computed on the phone; the outer planets come from JPL Horizons tables for 1979 to 2050.</string>
     <!-- Heading above the privacy paragraph -->
     <string name="about_privacy_heading">Privacy</string>
