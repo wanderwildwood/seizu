@@ -261,12 +261,13 @@ private fun hasLocation(context: Context): Boolean =
 private fun lastKnownLocation(context: Context): Pair<Double, Double>? {
     if (!hasLocation(context)) return null
     val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
-    providers.forEach { provider ->
-        val fix = runCatching { manager.getLastKnownLocation(provider) }.getOrNull()
-        if (fix != null) return fix.latitude to fix.longitude
-    }
-    return null
+    // The newest of the two, not the first found: after a trip the satellites' last word can be
+    // from another town while the network's is from here.
+    val fix = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+        .mapNotNull { provider -> runCatching { manager.getLastKnownLocation(provider) }.getOrNull() }
+        .maxByOrNull { it.elapsedRealtimeNanos }
+        ?: return null
+    return fix.latitude to fix.longitude
 }
 
 /** Opens this app's own page in Android's settings, where a permission refused for good can be given. */
