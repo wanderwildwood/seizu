@@ -292,14 +292,25 @@ class SkyBuilder(
         Planet.sPlanets?.forEach { planet ->
             planet.calcHeliocentric(time)
             planet.calcGeocentric(earth)
-            if (planet.mApparentMagnitude <= layers.magnitudeLimit) {
+            // Tonight's brightness, not the fixed brightest-ever figure the planet carries.
+            val magnitude = planetMagnitude(
+                id = planet.mWikidataId,
+                sunDistance = planet.mDistance_sun,
+                earthDistance = planet.mDistance_earth,
+                earthSunDistance = earth.mDistance_sun,
+                eclipticLongitude = planet.mEcliptic_lon,
+                eclipticLatitude = planet.mEcliptic_lat,
+                julianDay = julianDay,
+                fallback = planet.mApparentMagnitude,
+            )
+            if (magnitude <= layers.magnitudeLimit) {
                 // mRa is in degrees; the conversion wants hours.
                 val position = toHorizontal(planet.mRa / 15.0, planet.mDeclination)
                 add(
                     SkyBody(
                         azimuth = position[0],
                         elevation = position[1],
-                        magnitude = planet.mApparentMagnitude,
+                        magnitude = magnitude,
                         label = planet.mName,
                         kind = BodyKind.PLANET,
                     )
