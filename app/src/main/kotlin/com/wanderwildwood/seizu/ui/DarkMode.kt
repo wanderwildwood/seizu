@@ -295,16 +295,17 @@ object DarkMode {
     }
 
     /**
-     * Asks Home what its switch says. With no Home on the phone (no answer, or the provider is held
+     * Asks Home what its switch says. With no Home on the phone (the provider is missing, or held
      * by an app that is not Home), Home's last word is forgotten: settings brought back from a
-     * backup made beside Home would otherwise keep the app dark on a phone without it.
+     * backup made beside Home would otherwise keep the app dark on a phone without it. When the
+     * real Home gives no answer this once (its process starting or dying), its last word stands,
+     * so the window does not flip light and back.
      */
     private fun askHome() {
         val context = app ?: return
         asker.execute {
             runCatching {
-                val cursor = if (isHome(context)) context.contentResolver.query(HOME, null, null, null, null) else null
-                if (cursor == null) {
+                if (!isHome(context)) {
                     val p = prefs(context)
                     if (p.getBoolean(KEY_HOME, false)) {
                         p.edit().putBoolean(KEY_HOME, false).apply()
@@ -312,6 +313,7 @@ object DarkMode {
                     }
                     return@runCatching
                 }
+                val cursor = context.contentResolver.query(HOME, null, null, null, null) ?: return@runCatching
                 cursor.use { c ->
                     if (!c.moveToFirst()) return@use
                     val dark = c.getInt(c.getColumnIndexOrThrow("dark")) != 0
