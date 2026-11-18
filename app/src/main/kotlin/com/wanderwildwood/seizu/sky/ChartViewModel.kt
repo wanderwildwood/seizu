@@ -2,6 +2,7 @@ package com.wanderwildwood.seizu.sky
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,7 +53,11 @@ data class Pointing(
     val compassUnsure: Boolean = false,
 )
 
-class ChartViewModel(application: Application) : AndroidViewModel(application) {
+class ChartViewModel(
+    application: Application,
+    /** Holds a chosen moment across the app being stopped in the background, as the open dialogs are. */
+    private val saved: SavedStateHandle,
+) : AndroidViewModel(application) {
 
     private val preferences = Preferences(application)
 
@@ -63,6 +68,7 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
             longitude = preferences.longitude,
             facing = preferences.facing,
             usingGps = preferences.placeFromGps,
+            fixedTime = saved.get<Long>(FIXED_TIME)?.let { millis -> GregorianCalendar().apply { timeInMillis = millis } },
             turnWithPhone = preferences.turnWithPhone,
         )
     )
@@ -139,6 +145,7 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setTime(time: GregorianCalendar?) {
+        saved[FIXED_TIME] = time?.timeInMillis
         _state.update { it.copy(fixedTime = time) }
         rebuild()
     }
@@ -262,3 +269,6 @@ fun steppedTime(from: GregorianCalendar, hours: Int, days: Int): GregorianCalend
 
 /** How long until the clock next shows a new minute; a whole minute when it has just turned. */
 fun millisToNextMinute(nowMillis: Long): Long = 60_000L - nowMillis.mod(60_000L)
+
+/** The chosen moment's epoch millis in the saved state; absent while the chart follows the clock. */
+private const val FIXED_TIME = "fixedTime"
