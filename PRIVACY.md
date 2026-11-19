@@ -43,6 +43,7 @@ stored. All in `SharedPreferences`, all visible in `sky/Preferences.kt`.
 
 Whether dark mode is on is kept beside them, in `ui/DarkMode.kt`. When Home is installed,
 the app reads Home's dark mode switch, a yes or no, and sends nothing to it.
+The app can also see which browsers the phone has, so a link in About opens in a real one. It sends them nothing.
 
 No history, no log of where you have been, no record of what you looked at.
 
