@@ -10,7 +10,7 @@ sixteen grays, a slow redraw, and is read outdoors as often as indoors.
 
 | | | | |
 |---|---|---|---|
-| ![Chart](screenshots/01-chart.png) | ![An object](screenshots/02-object.png) | ![Settings](screenshots/03-settings.png) | ![About](screenshots/04-about.png) |
+| ![The whole sky](screenshots/1-chart.png) | ![Closer, facing north](screenshots/2-closer.png) | ![A planet, tapped](screenshots/3-object.png) | ![Settings](screenshots/4-settings.png) |
 
 ## Why it is black on white
 
